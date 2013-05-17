@@ -205,41 +205,35 @@ public class Control extends Activity {
 			}
 		});
 
-		test.setOnTouchListener(new View.OnTouchListener() {
-			
+		test.setOnClickListener(new View.OnClickListener() {
+
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) {
-					do {
-						long timeStart = System.currentTimeMillis();
-						pid(50);
-//						long timeEnd = System.currentTimeMillis();
-						
-//						display5.setText((timeEnd- timeStart) + " t");
-
-						
-						while ((System.currentTimeMillis() - timeStart) < 250){
-							
-						}
-						
-						
-						//sleep(50);
-						
-					
-					} while (event.getAction() == MotionEvent.ACTION_DOWN);
-
-//					move(Value.getStop());
-
-				} else if (action == MotionEvent.ACTION_UP) {
-					move(Value.getStop());
-				}
-				return true;
-			}
-		});
-			
+			public void onClick(View arg0) {
 
 				
+
+				Thread pid = new Thread() {
+					public void run() {
+
+						
+
+					}
+				};
+
+				do {
+					long timeStart = System.currentTimeMillis();
+					pid(50);
+					// long timeEnd = System.currentTimeMillis();
+
+					// display5.setText((timeEnd- timeStart) + " t");
+
+					while ((System.currentTimeMillis() - timeStart) < 250) {
+
+					}
+
+				} while (true);
+			}
+		});
 
 	}
 
@@ -249,29 +243,26 @@ public class Control extends Activity {
 
 	public static double integral = 0;
 	public static double oldError = 0;
-
+	
 	public static void pid(int wantPosition) { // try double
 		byte[] motor = motorDataStructure;
+
+		
 
 		double kp = 5;
 		double ki = 0;
 		double kd = 0;
 
-		double error;
-
+		 double error;
 		double derivative;
-
 		double actualPosition;
 
-		// int time = 0;
 		double output;
-
-		// do {
-		// time++;
+		
 		actualPosition = readDistance();
 
 		error = wantPosition - actualPosition;
-		integral += error ;
+		integral += error;
 
 		if (integral > 100) {
 			integral = 100;
@@ -279,15 +270,13 @@ public class Control extends Activity {
 			integral = -100;
 		}
 
-		derivative = (error - oldError) ;
-		
-		
+		derivative = (error - oldError);
 
 		output = ((kp * error) + (ki * integral) + (kd * derivative));
 
 		if (output > 100) {
 			output = 100;
-		} else if (output < -100){
+		} else if (output < -100) {
 			output = -100;
 		}
 
@@ -295,26 +284,12 @@ public class Control extends Activity {
 		motorDataStructure[19] = (byte) -output;
 		write(motorDataStructure);
 
-		// sleep (100); // tune the wait period
-
 		oldError = error;
-		
+
 		display2.setText(error + " e");
 		display3.setText(integral + " i");
 		display4.setText(derivative + " d");
 		display5.setText(output + " pw");
-
-		// if (wantPosition == actualPosition) {
-		// time = 0;
-		// }
-
-		// } while (time > 5);// XXX how long ? 10 sec
-
-		// Stop NXT after breaking out of the PID loop
-		// motorDataStructure[5] = 0;
-		// motorDataStructure[19] = 0;
-		//
-		// write(motorDataStructure);
 	}
 
 	public static int readMotorRotationCount() {
