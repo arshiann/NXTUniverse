@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 
 	// Global variable
 	// Declaring Buttons and images
-	Button connect, disconnect, control, about;
+	Button connect, disconnect, control, about, scanDevice;
 	ToggleButton bluetooth;
 	ImageView xImage;
 
@@ -53,39 +53,11 @@ public class MainActivity extends Activity {
 		disconnect = (Button) findViewById(R.id.disconnect);
 		control = (Button) findViewById(R.id.control);
 		about = (Button) findViewById(R.id.about);
+		scanDevice = (Button) findViewById(R.id.scan);
 		// End of buttons
 
 		// Assigning task to buttons
-		control.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent startControl = new Intent(
-						"android.intent.action.CONTROL");
-				startActivity(startControl);
-			}
-		});
-
-		disconnect.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				boolean success;
-				try {
-					socket.close();
-					success = true;
-				} catch (IOException e) {
-					e.printStackTrace();
-					success = false;
-				}
-
-				if (success) {
-					xImage.setImageResource(R.drawable.red);
-				} else {
-					xImage.setImageResource(R.drawable.green);
-				}
-			}
-		});
+		
 
 		connect.setOnClickListener(new View.OnClickListener() {
 
@@ -119,6 +91,37 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+		
+		disconnect.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				boolean success;
+				try {
+					socket.close();
+					success = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+					success = false;
+				}
+
+				if (success) {
+					xImage.setImageResource(R.drawable.red);
+				} else {
+					xImage.setImageResource(R.drawable.green);
+				}
+			}
+		});
+
+		control.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent startControl = new Intent(
+						"android.intent.action.CONTROL");
+				startActivity(startControl);
+			}
+		});
 
 		// bluetooth.setOnClickListener(new View.OnClickListener() {
 		//
@@ -146,6 +149,17 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Intent startAbout = new Intent("android.intent.action.ABOUT");
 				startActivity(startAbout);
+			}
+		});
+		
+		scanDevice.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent startScan = new Intent(
+						"android.intent.action.SCAN");
+				startActivity(startScan);
 			}
 		});
 	}
