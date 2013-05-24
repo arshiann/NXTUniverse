@@ -143,8 +143,9 @@ public class ChooseDevice extends Activity {
 			BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 			
 			BluetoothSocket socket;
-			OutputStream outStream;
-			InputStream inStream;
+			
+			OutputStream outStream = MainActivity.outStream;
+			InputStream inStream = MainActivity.inStream;
 			
 			BluetoothDevice nxt = adapter.getRemoteDevice(address);
 
@@ -160,7 +161,9 @@ public class ChooseDevice extends Activity {
 
 				byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03,
 						0x0B, 0x02, (byte) 0xFA, 0x00 };
-				outStream.write(confirmationTone);
+				
+				MainActivity.outStream.write(confirmationTone);
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
