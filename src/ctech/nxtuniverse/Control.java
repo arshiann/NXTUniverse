@@ -2,9 +2,11 @@ package ctech.nxtuniverse;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.Thread.State;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -14,16 +16,16 @@ public class Control extends Activity {
 
 	// Global objects
 	// Buttons
-	public static Button readDistance, getMotorStatus, resetMotorCount;
-	public static Button test, test2;
-	public static Button forward, backward, left, right;
+	static Button readDistance, getMotorStatus, resetMotorCount;
+	static Button test, test2;
+	static Button forward, backward, left, right;
 
 	// Text displays
-	public static TextView display1, display2, display3, display4, display5;
+	static TextView display1, display2, display3, display4, display5;
 
 	// Value classes to access NXT direct command codes
-	public static CustomValue Value = new CustomValue();
-	public static kNXTValue kNXTvalue = new kNXTValue();
+	static CustomValue Value = new CustomValue();
+	static kNXTValue kNXTvalue = new kNXTValue();
 
 	// Communication - In and Out Stream
 	public static OutputStream outStream = MainActivity.outStream;
@@ -32,9 +34,9 @@ public class Control extends Activity {
 	// Ports on NXT device - Define ports
 	static byte rightMotorPort = Value.getMotorA();
 	static byte leftMotorPort = Value.getMotorB();
-	static byte ultrasonicSensor = Value.getSensor4();
+	static byte ultrasonicSensorPort = Value.getSensor4();
 
-	public static byte[] motorDataStructure = new byte[28];
+	static byte[] motorDataStructure = new byte[28];
 	{
 		// right motor
 		motorDataStructure[0] = 0x0c; // length (from byte 2 to 13 inclusive)
@@ -44,7 +46,7 @@ public class Control extends Activity {
 		motorDataStructure[4] = rightMotorPort; // port
 		motorDataStructure[5] = (byte) 0; // power
 		motorDataStructure[6] = 0x07; // XXX unknown predefined value
-		motorDataStructure[7] = 0x02; // coast
+		motorDataStructure[7] = 0x02; // motor regulation
 		motorDataStructure[8] = (byte) 0; // turn ratio
 		// ratio between power supply
 		motorDataStructure[9] = Value.getMotorRunStateRunning();
@@ -61,7 +63,7 @@ public class Control extends Activity {
 		motorDataStructure[18] = leftMotorPort; // port
 		motorDataStructure[19] = (byte) 0; // power
 		motorDataStructure[20] = 0x07; // XXX unknown predefined value
-		motorDataStructure[21] = 0x02; // coast //XXX
+		motorDataStructure[21] = 0x02; // motor regulation
 		motorDataStructure[22] = (byte) 0; // turn ratio
 		motorDataStructure[23] = Value.getMotorRunStateRunning();
 		motorDataStructure[24] = 0x00;// taco limit
@@ -70,6 +72,8 @@ public class Control extends Activity {
 		motorDataStructure[27] = 0x00;// taco limit
 
 	}
+	
+	static PID pid;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,15 +104,17 @@ public class Control extends Activity {
 		// Test buttons
 		test = (Button) findViewById(R.id.test);
 		test2 = (Button) findViewById(R.id.test2);
+		
+		
 
 		// Setting up sensors
 		try {
 			// Ultrasonic sensor
-			byte[] command = { Value.getNullReturn(), Value.getSetInputMode(),
-					ultrasonicSensor, Value.getLowSpeed9V(), Value.getRawMode() };
-			byte[] data = getData(command);
-			write(data);
-			Thread.sleep(100);
+			byte[] ultrasonicSetupCommand = { 0x05, 0x00,
+					Value.getNullReturn(), Value.getSetInputMode(),
+					ultrasonicSensorPort, Value.getLowSpeed9V(),
+					Value.getRawMode() };
+			write(ultrasonicSetupCommand);
 			write(Value.setContinuous);
 			// End of ultrasonic sensor setup
 		} catch (Exception e) {
@@ -130,7 +136,8 @@ public class Control extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				display1.setText(readMotorRotationCount() + " rotation");
+				display1.setText(intArrayToString(readMotorRotationCount())
+						+ " rotation");
 			}
 		});
 
@@ -201,124 +208,62 @@ public class Control extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
-				// Test button 2
+				pid.kill();
+
 			}
 		});
 
+		
 		test.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 
-				
+				pid = new PID ();
+				pid.setWantPosition(50);
+				pid.start();
 
-				Thread pid = new Thread() {
-					public void run() {
-
-						
-
-					}
-				};
-
-				do {
-					long timeStart = System.currentTimeMillis();
-					pid(50);
-					// long timeEnd = System.currentTimeMillis();
-
-					// display5.setText((timeEnd- timeStart) + " t");
-
-					while ((System.currentTimeMillis() - timeStart) < 250) {
-
-					}
-
-				} while (true);
 			}
 		});
 
 	}
+	
+	
 
 	// End of onCreate
 
 	// Methods
 
-	public static double integral = 0;
-	public static double oldError = 0;
-	
-	public static void pid(int wantPosition) { // try double
-		byte[] motor = motorDataStructure;
 
-		
+	public static void pid() {
 
-		double kp = 5;
-		double ki = 0;
-		double kd = 0;
-
-		 double error;
-		double derivative;
-		double actualPosition;
-
-		double output;
-		
-		actualPosition = readDistance();
-
-		error = wantPosition - actualPosition;
-		integral += error;
-
-		if (integral > 100) {
-			integral = 100;
-		} else if (integral < -100) {
-			integral = -100;
-		}
-
-		derivative = (error - oldError);
-
-		output = ((kp * error) + (ki * integral) + (kd * derivative));
-
-		if (output > 100) {
-			output = 100;
-		} else if (output < -100) {
-			output = -100;
-		}
-
-		motorDataStructure[5] = (byte) -output;
-		motorDataStructure[19] = (byte) -output;
-		write(motorDataStructure);
-
-		oldError = error;
-
-		display2.setText(error + " e");
-		display3.setText(integral + " i");
-		display4.setText(derivative + " d");
-		display5.setText(output + " pw");
 	}
 
-	public static int readMotorRotationCount() {
-		byte[] rightMotorCommand = { Value.getReturnStatus(), 0x06,
+	public static int[] readMotorRotationCount() {
+		byte[] rightMotorCommand = { 0x03, 0x00, Value.getReturnStatus(), 0x06,
 				rightMotorPort };
-		byte[] leftMotorCommand = { Value.getReturnStatus(), 0x06,
+		byte[] leftMotorCommand = { 0x03, 0x00, Value.getReturnStatus(), 0x06,
 				leftMotorPort };
 
-		byte[] rightMotorCommandingData = getData(rightMotorCommand);
-		byte[] leftMotorCommandingData = getData(leftMotorCommand);
-
-		write(rightMotorCommandingData);
-		sleep(100);
-		write(leftMotorCommandingData);
+		write(rightMotorCommand);
+		write(leftMotorCommand);
 
 		int[] input4 = read();
-		sleep(100);
 		int[] input5 = read();
 
-		// right motor
-		int value;
+		int[] value = new int[2];
 
 		try {
-			value = input4[19] + (input4[20] << 8) + (input4[21] << 16)
+			// right motor
+			value[0] = input4[19] + (input4[20] << 8) + (input4[21] << 16)
 					+ (input4[22] << 24);
+			// left motor
+			value[1] = input5[19] + (input5[20] << 8) + (input5[21] << 16)
+					+ (input5[22] << 24);
 		} catch (Exception e) {
-			value = 255;
+			value[0] = 255;
+			value[1] = 255;
 		}
-		// display2.setText(value + " suc 17-20");
 
 		return value;
 
@@ -363,17 +308,13 @@ public class Control extends Activity {
 	 * Reset motor count
 	 */
 	public static void resetMotorCount() {
-		byte[] rightMotorCommand = { Value.getNullReturn(), 0x0A,
+		byte[] rightMotorCommand = { 0x04, 0x00, Value.getNullReturn(), 0x0A,
 				rightMotorPort, 1 }; // 1 is boolean true in byte
-		byte[] leftMotorCommand = { Value.getNullReturn(), 0x0A, leftMotorPort,
-				1 };
+		byte[] leftMotorCommand = { 0x04, 0x00, Value.getNullReturn(), 0x0A,
+				leftMotorPort, 1 };
 
-		byte[] rightMotorCommandingData = getData(rightMotorCommand);
-		byte[] leftMotorCommandingData = getData(leftMotorCommand);
-
-		write(rightMotorCommandingData);
-		sleep(100);
-		write(leftMotorCommandingData);
+		write(rightMotorCommand);
+		write(leftMotorCommand);
 	}
 
 	/**
@@ -386,21 +327,21 @@ public class Control extends Activity {
 		byte[] askStatusOnPort3 = { 0x03, 0x00, 0x00, 0x0E, 0x03 };
 		byte[] readByteZero = { 0x07, 0x00, 0x00, 0x0F, 0x03, 0x02, 0x01, 0x02,
 				0x42 };
+		final byte[] readLS = { 0x03, 0x00, 0x00, 0x10, 0x03 };
 
 		@SuppressWarnings("unused")
 		int[] input1;
-
 		int[] input2;
 		int[] input3;
-
-		byte[] readLS = Value.readLS; // XXX cahnge
 
 		// Read write
 		try {
 			write(readByteZero);
+			sleep(100);
+			// Clearing NXT buffer for further reading
 			input1 = read();
 
-			// Wait till there is something to read
+			// Wait until there is something to read
 			do {
 				write(askStatusOnPort3);
 				input2 = read();
@@ -439,36 +380,19 @@ public class Control extends Activity {
 			motor[19] = (byte) -power;
 		} else if (direction == Value.getTurnRight()) {
 			motor[5] = (byte) -power;
+			motor[7] = 0x00;
 			motor[19] = (byte) power;
+			motor[21] = 0x00;
 		} else if (direction == Value.getTurnLeft()) {
 			motor[5] = (byte) power;
+			motor[7] = 0x00;
 			motor[19] = (byte) -power;
+			motor[21] = 0x00;
 		} else {
 			motor[5] = (byte) 0;
 			motor[19] = (byte) 0;
 		}
 		write(motor);
-	}
-
-	/**
-	 * Translates command into data (byte array)
-	 * 
-	 * @param returnType
-	 *            - 0x80, NXT will not send any status. 0x00, NXT will send
-	 *            status. You can also get values form value class(es).
-	 * @param command
-	 *            - Command that will be translated into data (byte array)
-	 * @return Data (byte array) of the command.
-	 */
-	public static byte[] getData(byte[] command) {
-		int size = command.length + 2;
-		byte[] commandData = new byte[size];
-		commandData[0] = (byte) (size - 2);
-		commandData[1] = 0x00;
-		for (int i = 0; i < command.length; i++) {
-			commandData[i + 2] = command[i];
-		}
-		return commandData;
 	}
 
 	/**
@@ -533,6 +457,7 @@ public class Control extends Activity {
 	 *            - Array of data that will be written on the NXT device
 	 */
 	public static void write(byte[] data) {
+
 		try {
 			outStream.write(data);
 			outStream.flush();
@@ -545,9 +470,14 @@ public class Control extends Activity {
 	// /////////////////////////////////////////////////////////////////////////
 
 	@Override
+	protected void onPause() {
+		super.onDestroy();
+		finish();
+	}
+
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
 		finish();
 	}
 }
