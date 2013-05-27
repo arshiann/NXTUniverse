@@ -72,8 +72,8 @@ public class Control extends Activity {
 		motorDataStructure[27] = 0x00;// taco limit
 
 	}
-	
-	static PID pid;
+
+	static DistancePID pid;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +104,6 @@ public class Control extends Activity {
 		// Test buttons
 		test = (Button) findViewById(R.id.test);
 		test2 = (Button) findViewById(R.id.test2);
-		
-		
 
 		// Setting up sensors
 		try {
@@ -213,31 +211,25 @@ public class Control extends Activity {
 			}
 		});
 
-		
 		test.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 
-				pid = new PID ();
-				pid.setWantPosition(50);
-				pid.start();
+				if (pid == null) {
+					pid = new DistancePID(50);
+					// pid.setWantPosition(50);
+					pid.start();
+				}
 
 			}
 		});
 
 	}
-	
-	
 
 	// End of onCreate
 
 	// Methods
-
-
-	public static void pid() {
-
-	}
 
 	public static int[] readMotorRotationCount() {
 		byte[] rightMotorCommand = { 0x03, 0x00, Value.getReturnStatus(), 0x06,
@@ -463,7 +455,7 @@ public class Control extends Activity {
 			outStream.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
-			display5.setText("Connection lost");
+			// display5.setText("Connection lost");
 		}
 	}
 

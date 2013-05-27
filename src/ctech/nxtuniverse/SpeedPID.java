@@ -1,6 +1,8 @@
 package ctech.nxtuniverse;
 
-public class PID extends Thread {
+public class SpeedPID {
+
+
 	
 	static double kp = 5;
 	static double ki = 0;
@@ -11,33 +13,32 @@ public class PID extends Thread {
 
 	static double error;
 	static double derivative;
-	static double actualPosition;
+	static double actualSpeed;
 
 	static double output;
 
-	int wantPosition = 0;
-
+	private int wantSpeed;
 	
+	SpeedPID(int wantPosition){
+		this.setWantPosition(wantPosition);
+		this.active=true;
+	}
 
 	volatile boolean active = true;
 
 	public void run() {
 
-		if (wantPosition == 0) {
-			active = false;
-		}
-
 		byte[] motor = Control.motorDataStructure;
 		long startTime = System.currentTimeMillis();
 
 		while (active) {
-			startTime = System.currentTimeMillis();
+//			startTime = System.currentTimeMillis();
 
-			actualPosition = Control.readDistance();
+//			actualSpeed = Control.readDistance();
 
-			// PID calculation
-			error = wantPosition - actualPosition;
-			integral += error;
+			// DistancePID calculation
+			error = wantSpeed - actualSpeed;
+			integral += error*timeElapsed;
 
 			if (integral > 100) {
 				integral = 100;
@@ -45,8 +46,8 @@ public class PID extends Thread {
 				integral = -100;
 			}
 
-			derivative = (error - oldError);
-			// PID calculation ends
+			derivative = (error - oldError)/timeElapsed;
+			// DistancePID calculation ends
 
 			output = ((kp * error) + (ki * integral) + (kd * derivative));
 
@@ -62,15 +63,17 @@ public class PID extends Thread {
 
 			oldError = error;
 
-			long timeElapsed = System.currentTimeMillis() - startTime;
-
-			if (timeElapsed < 250) {
-				try {
-					Thread.sleep(250 - timeElapsed);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			
+			
+//			long timeElapsed = System.currentTimeMillis() - startTime;
+//
+//			if (timeElapsed < 250) {
+//				try {
+//					Thread.sleep(250 - timeElapsed);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
 		}
 
 		motor[5] = 0;
@@ -82,9 +85,9 @@ public class PID extends Thread {
 	public void setWantPosition (int wantPosition) {
 		// NXT's body in front of the sensor is 13 cm
 		if (wantPosition <= 13){
-			this.wantPosition = 13;
+			this.wantSpeed = 13;
 		} else {
-			this.wantPosition = wantPosition;
+			this.wantSpeed = wantPosition;
 		}
 	}
 
