@@ -1,3 +1,36 @@
+/*
+ * 
+ * This file is derived from
+ * http://nxt-remote-control.googlecode.com/svn/trunk/src/org/jfedor/nxtremotecontrol/ChooseDeviceActivity.java
+ * For the purpose of school's project.
+ * 
+ * This project is non-commercial and open source
+ * 
+ ********************************************************************************************************************************
+ * Copyright (c) 2010 Jacek Fedorynski
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ *
+ * This file is derived from:
+ * 
+ * http://developer.android.com/resources/samples/BluetoothChat/src/com/example/android/BluetoothChat/DeviceListActivity.html
+ * 
+ * Copyright (c) 2009 The Android Open Source Project
+ * *******************************************************************************************************************************
+ */
+
 package ctech.nxtuniverse;
 
 import java.io.IOException;
@@ -26,22 +59,16 @@ import android.widget.TextView;
 
 public class ChooseDevice extends Activity {
 
-	public static String EXTRA_DEVICE_ADDRESS = "device_address";
+	// public static String EXTRA_DEVICE_ADDRESS = "device_address";
 
-	private ArrayAdapter<String> mPairedDevicesArrayAdapter;
-	private ArrayAdapter<String> mNewDevicesArrayAdapter;
+	private ArrayAdapter<String> pairedRobot;
+	private ArrayAdapter<String> newRobot;
 	private BluetoothAdapter mBtAdapter;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	ListView pairedList, newRobotList;
+
+	protected void onStart(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
-		setContentView(R.layout.device_layout);
-
-		// setResult(Activity.RESULT_CANCELED);
-
 		Button scanButton = (Button) findViewById(R.id.button_scan);
 
 		scanButton.setOnClickListener(new View.OnClickListener() {
@@ -53,20 +80,34 @@ public class ChooseDevice extends Activity {
 
 			}
 		});
+	}
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-		mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this,
-				R.layout.device_name);
-		mNewDevicesArrayAdapter = new ArrayAdapter<String>(this,
-				R.layout.device_name);
+		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		ListView pairedListView = (ListView) findViewById(R.id.paired_devices);
+		setContentView(R.layout.device_layout);
 
-		pairedListView.setAdapter(mPairedDevicesArrayAdapter);
-		pairedListView.setOnItemClickListener(mDeviceClickListener);
+		// setResult(Activity.RESULT_CANCELED);
+		
+//		if (!mBtAdapter.isEnabled()){
+//			finish();
+//		}
 
-		ListView newDevicesListView = (ListView) findViewById(R.id.new_devices);
-		newDevicesListView.setAdapter(mNewDevicesArrayAdapter);
-		newDevicesListView.setOnItemClickListener(mDeviceClickListener);
+		
+
+		pairedRobot = new ArrayAdapter<String>(this, R.layout.device_name);
+		newRobot = new ArrayAdapter<String>(this, R.layout.device_name);
+
+		pairedList = (ListView) findViewById(R.id.paired_devices);
+		pairedList.setAdapter(pairedRobot);
+		pairedList.setOnItemClickListener(clickListener);
+
+		newRobotList = (ListView) findViewById(R.id.new_devices);
+		newRobotList.setAdapter(newRobot);
+		newRobotList.setOnItemClickListener(clickListener);
 
 		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 		this.registerReceiver(mReceiver, filter);
@@ -84,7 +125,7 @@ public class ChooseDevice extends Activity {
 			for (BluetoothDevice device : pairedDevices) {
 				if ((device.getBluetoothClass() != null)
 						&& (device.getBluetoothClass().getDeviceClass() == BluetoothClass.Device.TOY_ROBOT)) {
-					mPairedDevicesArrayAdapter.add(device.getName() + "\n"
+					pairedRobot.add(device.getName() + "\n"
 							+ device.getAddress());
 					empty = false;
 				}
@@ -92,7 +133,7 @@ public class ChooseDevice extends Activity {
 		}
 		if (!empty) {
 			findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
-			findViewById(R.id.no_devices).setVisibility(View.GONE);
+			findViewById(R.id.textView_display).setVisibility(View.GONE);
 		}
 	}
 
@@ -119,34 +160,34 @@ public class ChooseDevice extends Activity {
 
 		mBtAdapter.startDiscovery();
 
-		mNewDevicesArrayAdapter.clear();
+		newRobot.clear();
 		findViewById(R.id.title_new_devices).setVisibility(View.GONE);
-		if (mPairedDevicesArrayAdapter.getCount() == 0) {
-			findViewById(R.id.no_devices).setVisibility(View.VISIBLE);
+		if (pairedRobot.getCount() == 0) {
+			findViewById(R.id.textView_display).setVisibility(View.VISIBLE);
 		}
 	}
 
-	private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
+	private OnItemClickListener clickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 			mBtAdapter.cancelDiscovery();
 
 			String info = ((TextView) v).getText().toString();
 			String address = info.substring(info.length() - 17);
 
-//			Intent intent = new Intent();
-//			intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
+			// Intent intent = new Intent();
+			// intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
 
-//			setResult(Activity.RESULT_OK, intent);
+			// setResult(Activity.RESULT_OK, intent);
 
 			// //////////
 
 			BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-			
+
 			BluetoothSocket socket;
-			
+
 			OutputStream outStream = MainActivity.outStream;
 			InputStream inStream = MainActivity.inStream;
-			
+
 			BluetoothDevice nxt = adapter.getRemoteDevice(address);
 
 			try {
@@ -154,16 +195,16 @@ public class ChooseDevice extends Activity {
 				socket = nxt.createRfcommSocketToServiceRecord(UUID
 						.fromString("00001101-0000-1000-8000-00805F9B34FB"));
 				socket.connect();
-				outStream = MainActivity.socket.getOutputStream();
-				inStream = MainActivity.socket.getInputStream();
+				outStream = socket.getOutputStream();
+				inStream = socket.getInputStream();
 
 				// Play the
 
 				byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03,
 						0x0B, 0x02, (byte) 0xFA, 0x00 };
-				
-				MainActivity.outStream.write(confirmationTone);
-				
+
+				outStream.write(confirmationTone);
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -184,11 +225,11 @@ public class ChooseDevice extends Activity {
 						.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				if ((device.getBondState() != BluetoothDevice.BOND_BONDED)
 						&& (device.getBluetoothClass().getDeviceClass() == BluetoothClass.Device.TOY_ROBOT)) {
-					mNewDevicesArrayAdapter.add(device.getName() + "\n"
-							+ device.getAddress());
+					newRobot.add(device.getName() + "\n" + device.getAddress());
 					findViewById(R.id.title_new_devices).setVisibility(
 							View.VISIBLE);
-					findViewById(R.id.no_devices).setVisibility(View.GONE);
+					findViewById(R.id.textView_display)
+							.setVisibility(View.GONE);
 				}
 			} else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
 					.equals(action)) {

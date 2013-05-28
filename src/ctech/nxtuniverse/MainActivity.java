@@ -8,7 +8,6 @@ import java.util.UUID;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ToggleButton;
 import android.app.Activity;
@@ -20,11 +19,10 @@ import android.content.Intent;
 
 public class MainActivity extends Activity {
 
-	// Global variable
-	// Declaring Buttons and images
+	// Buttons and images
 	Button connect, disconnect, control, about, scanDevice;
-	ToggleButton bluetooth;
-	ImageView xImage;
+	// ToggleButton bluetooth;
+	ImageView xImage, bluetooth;
 
 	// Declaring
 	public static BluetoothAdapter adapter = BluetoothAdapter
@@ -36,28 +34,60 @@ public class MainActivity extends Activity {
 	// MAC address of the NXT device
 	String nxtMacAddress = "00:16:53:12:AA:37";
 
-	//CustomValue Value = new CustomValue();
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// Linking XML to current java file
 		// Images
 		xImage = (ImageView) findViewById(R.id.xImage);
+		bluetooth = (ImageView) findViewById(R.id.image_bluetooth);
 
 		// Buttons
-		bluetooth = (ToggleButton) findViewById(R.id.bluetooth);
+		// bluetooth = (ToggleButton) findViewById(R.id.bluetooth);
 		connect = (Button) findViewById(R.id.connect);
 		disconnect = (Button) findViewById(R.id.disconnect);
 		control = (Button) findViewById(R.id.control);
 		about = (Button) findViewById(R.id.about);
 		scanDevice = (Button) findViewById(R.id.scan);
-		// End of buttons
+
+		// XXX new bluetooth apparatus
+		if (adapter.isEnabled()) {
+			bluetooth.setImageResource(R.drawable.bluetooth_alive);
+		} else {
+			bluetooth.setImageResource(R.drawable.bluetooth_dead);
+		}
 
 		// Assigning task to buttons
-		
+		bluetooth.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				boolean enabling = false;
+				if (adapter.isEnabled()) {
+					adapter.disable();
+					bluetooth.setImageResource(R.drawable.bluetooth_dead);
+				} else {
+					enabling = true;
+					adapter.enable();
+				}
+
+				if (enabling) {
+					while (!adapter.isEnabled()) {
+					}
+					bluetooth.setImageResource(R.drawable.bluetooth_alive);
+				}
+			}
+		});
+
+		scanDevice.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent startScan = new Intent("android.intent.action.SCAN");
+				startActivity(startScan);
+			}
+		});
 
 		connect.setOnClickListener(new View.OnClickListener() {
 
@@ -75,8 +105,8 @@ public class MainActivity extends Activity {
 
 					// Play the
 
-					byte[] confirmationTone = {0x06, 0x00, (byte) 0x80, 0x03,
-							0x0B, 0x02, (byte) 0xFA, 0x00};
+					byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03,
+							0x0B, 0x02, (byte) 0xFA, 0x00 };
 					outStream.write(confirmationTone);
 					success = true;
 				} catch (IOException e) {
@@ -91,7 +121,7 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
-		
+
 		disconnect.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -131,17 +161,19 @@ public class MainActivity extends Activity {
 		// }
 		// });
 
-//		bluetooth
-//				.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//					public void onChecketacodChanged(CompoundButton buttonView,	boolean isOn) {
-//
-//						if (isOn) {
-//							adapter.enable();
-//						} else {
-//							adapter.disable();
-//						}
-//					}
-//				});
+		// bluetooth
+		// .setOnCheckedChangeListener(new
+		// CompoundButton.OnCheckedChangeListener() {
+		// public void onChecketacodChanged(CompoundButton buttonView, boolean
+		// isOn) {
+		//
+		// if (isOn) {
+		// adapter.enable();
+		// } else {
+		// adapter.disable();
+		// }
+		// }
+		// });
 
 		about.setOnClickListener(new View.OnClickListener() {
 
@@ -151,17 +183,7 @@ public class MainActivity extends Activity {
 				startActivity(startAbout);
 			}
 		});
-		
-		scanDevice.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Intent startScan = new Intent(
-						"android.intent.action.SCAN");
-				startActivity(startScan);
-			}
-		});
+
 	}
 
 	@Override
@@ -174,12 +196,4 @@ public class MainActivity extends Activity {
 		}
 		finish();
 	}
-
-	// @Override
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// // Inflate the menu; this adds items to the action bar if it is present.
-	// getMenuInflater().inflate(R.menu.main, menu);
-	// return true;
-	// }
-
 }

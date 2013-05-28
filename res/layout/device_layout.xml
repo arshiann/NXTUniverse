@@ -16,9 +16,9 @@
     </TextView>
 
     <ListView
-        android:id="@+id/paired_devices"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+    android:id="@+id/paired_devices"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
     </ListView>
 
     <TextView
@@ -35,11 +35,12 @@
     <ListView
         android:id="@+id/new_devices"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="300dp"
+        android:layout_weight="0.05" >
     </ListView>
 
     <TextView
-        android:id="@+id/no_devices"
+        android:id="@+id/textView_display"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

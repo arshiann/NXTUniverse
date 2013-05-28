@@ -8,15 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <ImageView
-        android:id="@+id/xImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
-        android:src="@drawable/ic_launcher" />
-
     <Button
         android:id="@+id/connect"
         android:layout_width="wrap_content"
@@ -71,29 +62,30 @@
         android:layout_below="@+id/control"
         android:text="About" />
 
+    <ImageView
+        android:id="@+id/image_bluetooth"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/disconnect"
+        android:layout_alignTop="@+id/xImage"
+        android:src="@drawable/bluetooth_dead" />
+
+    <ImageView
+        android:id="@+id/xImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="50dp"
+        android:layout_toLeftOf="@+id/disconnect"
+        android:src="@drawable/ic_launcher" />
+
     <Button
         android:id="@+id/scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="Other Device" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="Bluetooth"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <ToggleButton
-        android:id="@+id/bluetooth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/scan"
-        android:layout_alignBottom="@+id/scan"
-        android:layout_toLeftOf="@+id/scan" />
+        android:layout_alignRight="@+id/about"
+        android:text="Other Device" />
 
 </RelativeLayout>
