@@ -1,44 +1,54 @@
 package ctech.nxtuniverse;
 
-public class SpeedPID {
+public class SpeedPID extends Thread {
 
+	double kp = 1;
+	double ki = 0;
+	double kd = 0;
 
-	
-	static double kp = 5;
-	static double ki = 0;
-	static double kd = 0;
+	double speedError;
+	double integral = 0;
+	double derivative;
 
-	public static double integral = 0;
-	public static double oldError = 0;
+	double oldSpeedError = 0;
 
-	static double error;
-	static double derivative;
-	static double actualSpeed;
+	int motorRotationCount;
 
-	static double output;
+	double outputSubtotal;
+	int output;
 
-	private int wantSpeed;
-	
-	SpeedPID(int wantPosition){
-		this.setWantPosition(wantPosition);
-		this.active=true;
-	}
+	int wantSpeed = 2; // Measured in m/s
 
-	volatile boolean active = true;
+	boolean active = true;
+
+	double time = 0; // XXX Pseudo time
+	double oldTime = 0; // XXX Pseudo old time
 
 	public void run() {
-
-		byte[] motor = Control.motorDataStructure;
-		long startTime = System.currentTimeMillis();
-
 		while (active) {
-//			startTime = System.currentTimeMillis();
 
-//			actualSpeed = Control.readDistance();
+			// get value form NXT
+			int[] tempMotorRotationCount = Control.getMotorRotationCount();
 
-			// DistancePID calculation
-			error = wantSpeed - actualSpeed;
-			integral += error*timeElapsed;
+			// setting right motor value
+			motorRotationCount = tempMotorRotationCount[0];
+
+			oldTime = time; // XXX Pseudo time
+			time++; // XXX Pseudo time
+
+			// Converting rotation to m/s
+
+			double motorSpeed = ((double) motorRotationCount / (double) 2500)
+					/ (time - oldTime); // XXX Pseudo time
+			// motor speed = { (rotation)*25*100 } / dt
+			// 25 rotation = 1 cm
+			// 100 cm = 1 m
+			// delta t = old time - current time
+
+			// PID Calculation
+			speedError = wantSpeed - motorSpeed;
+
+			integral += speedError * time; // XXX Pseudo time
 
 			if (integral > 100) {
 				integral = 100;
@@ -46,48 +56,41 @@ public class SpeedPID {
 				integral = -100;
 			}
 
-			derivative = (error - oldError)/timeElapsed;
-			// DistancePID calculation ends
+			derivative = (speedError - oldSpeedError) / (time - oldTime); // XXX
+																			// Pseudo
+																			// time
+			// End of PID Calculation
 
-			output = ((kp * error) + (ki * integral) + (kd * derivative));
+			// Value im m/s
+			outputSubtotal = ((kp * speedError) + (ki * integral) + (kd * derivative));
 
-			if (output > 100) {
-				output = 100;
-			} else if (output < -100) {
-				output = -100;
-			}
+			// converting back to rotation
+			double outputInRotation = outputSubtotal * (time - oldTime)
+					* ((double) 2500);
+			// XXX Pseudo time
 
-			motor[5] = (byte) -output;
-			motor[19] = (byte) -output;
-			Control.write(motor);
+			// Limiting final output power
+			// if (Output > 100) {
+			// Output = 100;
+			// } else if (Output < -100) {
+			// Output = -100;
+			// }
 
-			oldError = error;
+			// XXX get output power from (m/s) or (rotations)
+			output = (int) outputInRotation;
 
-			
-			
-//			long timeElapsed = System.currentTimeMillis() - startTime;
-//
-//			if (timeElapsed < 250) {
-//				try {
-//					Thread.sleep(250 - timeElapsed);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-		}
+			oldSpeedError = speedError;
 
-		motor[5] = 0;
-		motor[19] = 0;
-		Control.write(motor);
+			// long timeElapsed = System.currentTimeMillis() - startTime;
+			//
+			// if (timeElapsed < 250) {
+			// try {
+			// Thread.sleep(250 - timeElapsed);
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// }
+			// }
 
-	}
-	
-	public void setWantPosition (int wantPosition) {
-		// NXT's body in front of the sensor is 13 cm
-		if (wantPosition <= 13){
-			this.wantSpeed = 13;
-		} else {
-			this.wantSpeed = wantPosition;
 		}
 	}
 

@@ -61,6 +61,8 @@ public class DistancePID extends Thread {
 
 			oldError = error;
 
+			
+			
 			long timeElapsed = System.currentTimeMillis() - startTime;
 
 			if (timeElapsed < 250) {

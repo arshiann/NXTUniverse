@@ -134,7 +134,7 @@ public class Control extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				display1.setText(intArrayToString(readMotorRotationCount())
+				display1.setText(intArrayToString(getMotorRotationCount())
 						+ " rotation");
 			}
 		});
@@ -231,7 +231,7 @@ public class Control extends Activity {
 
 	// Methods
 
-	public static int[] readMotorRotationCount() {
+	public static int[] getMotorRotationCount() {
 		byte[] rightMotorCommand = { 0x03, 0x00, Value.getReturnStatus(), 0x06,
 				rightMotorPort };
 		byte[] leftMotorCommand = { 0x03, 0x00, Value.getReturnStatus(), 0x06,
