@@ -17,11 +17,11 @@ public class Control extends Activity {
 	// Global objects
 	// Buttons
 	static Button readDistance, getMotorStatus, resetMotorCount;
-	static Button test, test2;
+	static Button test, test2, test3, test4;
 	static Button forward, backward, left, right;
 
 	// Text displays
-	static TextView display1, display2, display3, display4, display5;
+	public static TextView display1, display2, display3, display4, display5;
 
 	// Value classes to access NXT direct command codes
 	static CustomValue Value = new CustomValue();
@@ -38,7 +38,6 @@ public class Control extends Activity {
 
 	static byte[] motorDataStructure = new byte[28];
 	{
-		// right motor
 		motorDataStructure[0] = 0x0c; // length (from byte 2 to 13 inclusive)
 		motorDataStructure[1] = 0x00; // start from byte 2
 		motorDataStructure[2] = (byte) 0x80; // return type
@@ -73,7 +72,8 @@ public class Control extends Activity {
 
 	}
 
-	static DistancePID pid;
+	static DistancePID distancePid;
+	static SpeedPID speedPid;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +104,8 @@ public class Control extends Activity {
 		// Test buttons
 		test = (Button) findViewById(R.id.test);
 		test2 = (Button) findViewById(R.id.test2);
+		test3 = (Button) findViewById(R.id.button_test3);
+		test4 = (Button) findViewById(R.id.button_test4);
 
 		// Setting up sensors
 		try {
@@ -202,25 +204,51 @@ public class Control extends Activity {
 			}
 		});
 
-		test2.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				pid.kill();
-
-			}
-		});
-
 		test.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 
-				if (pid == null) {
-					pid = new DistancePID(50);
-					// pid.setWantPosition(50);
-					pid.start();
+				if (distancePid == null) {
+					distancePid = new DistancePID(50);
+					distancePid.setWantPosition(50);
+					distancePid.start();
+					test.setText("Running");
+				} else {
+					distancePid.kill();
+					test.setText("Stopped");
 				}
+
+			}
+		});
+
+		test2.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				if (speedPid == null) {
+					speedPid = new SpeedPID();
+					speedPid.start();
+				}
+				else {
+					speedPid.kill();
+				}
+
+			}
+		});
+
+		test3.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				display5.setText(speedPid.integral + "");
+			}
+		});
+
+		test4.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
 
 			}
 		});
