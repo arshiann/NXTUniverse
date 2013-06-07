@@ -2,32 +2,34 @@ package ctech.nxtuniverse;
 
 public class DistancePID extends Thread {
 	
+	DistancePID(int wantPosition) {
+		setWantPosition(wantPosition);
+		this.active = true;
+	}
+	
+	// Remove static if necessary
 	static double kp = 5;
 	static double ki = 0;
 	static double kd = 0;
 
-	public static double integral = 0;
-	public static double oldError = 0;
-
-	static double error;
-	static double derivative;
-	static double actualPosition;
-
-	static double output;
-
-	private int wantPosition;
-	
-	DistancePID(int wantPosition){
-		this.setWantPosition(wantPosition);
-		this.active=true;
-	}
-
-	volatile boolean active = true;
+	private int wantPosition; // Measured in cm
+	private volatile boolean active = false; // XXX change it back to true
 
 	public void run() {
 
+		double distanceError = 0;
+		double integral = 0;
+		double derivative = 0;
+
+		double actualPosition;
+
+		double oldError = 0;
+
+		double output = 0;
+
 		byte[] motor = Control.motorDataStructure;
-		long startTime = System.currentTimeMillis();
+		// long startTime = System.currentTimeMillis();
+		long startTime;
 
 		while (active) {
 			startTime = System.currentTimeMillis();
@@ -35,8 +37,8 @@ public class DistancePID extends Thread {
 			actualPosition = Control.readDistance();
 
 			// DistancePID calculation
-			error = wantPosition - actualPosition;
-			integral += error;
+			distanceError = wantPosition - actualPosition;
+			integral += distanceError;
 
 			if (integral > 100) {
 				integral = 100;
@@ -44,10 +46,10 @@ public class DistancePID extends Thread {
 				integral = -100;
 			}
 
-			derivative = (error - oldError);
+			derivative = (distanceError - oldError);
 			// DistancePID calculation ends
 
-			output = ((kp * error) + (ki * integral) + (kd * derivative));
+			output = ((kp * distanceError) + (ki * integral) + (kd * derivative));
 
 			if (output > 100) {
 				output = 100;
@@ -59,10 +61,8 @@ public class DistancePID extends Thread {
 			motor[19] = (byte) -output;
 			Control.write(motor);
 
-			oldError = error;
+			oldError = distanceError;
 
-			
-			
 			long timeElapsed = System.currentTimeMillis() - startTime;
 
 			if (timeElapsed < 250) {
@@ -79,10 +79,10 @@ public class DistancePID extends Thread {
 		Control.write(motor);
 
 	}
-	
-	public void setWantPosition (int wantPosition) {
+
+	public void setWantPosition(int wantPosition) {
 		// NXT's body in front of the sensor is 13 cm
-		if (wantPosition <= 13){
+		if (wantPosition <= 13) {
 			this.wantPosition = 13;
 		} else {
 			this.wantPosition = wantPosition;

@@ -28,8 +28,8 @@ public class Control extends Activity {
 	static kNXTValue kNXTvalue = new kNXTValue();
 
 	// Communication - In and Out Stream
-	public static OutputStream outStream = MainActivity.outStream;
-	public static InputStream inStream = MainActivity.inStream;
+	static OutputStream outStream = MainActivity.outStream;
+	static InputStream inStream = MainActivity.inStream;
 
 	// Ports on NXT device - Define ports
 	static byte rightMotorPort = Value.getMotorA();
@@ -62,13 +62,13 @@ public class Control extends Activity {
 		motorDataStructure[18] = leftMotorPort; // port
 		motorDataStructure[19] = (byte) 0; // power
 		motorDataStructure[20] = 0x07; // XXX unknown predefined value
-		motorDataStructure[21] = 0x02; // motor regulation
+		motorDataStructure[21] = 0x00; // motor regulation
 		motorDataStructure[22] = (byte) 0; // turn ratio
 		motorDataStructure[23] = Value.getMotorRunStateRunning();
 		motorDataStructure[24] = 0x00;// taco limit
 		motorDataStructure[25] = 0x00;// taco limit
 		motorDataStructure[26] = 0x00;// taco limit
-		motorDataStructure[27] = 0x00;// taco limit
+		motorDataStructure[27] = 0x00;// tacoString numS limit
 
 	}
 
@@ -211,7 +211,7 @@ public class Control extends Activity {
 
 				if (distancePid == null) {
 					distancePid = new DistancePID(50);
-					distancePid.setWantPosition(50);
+//					distancePid.setWantPosition(50);
 					distancePid.start();
 					test.setText("Running");
 				} else {
@@ -228,9 +228,11 @@ public class Control extends Activity {
 			public void onClick(View arg0) {
 				if (speedPid == null) {
 					speedPid = new SpeedPID();
+					speedPid.setWantSpeed(3);
 					speedPid.start();
-				}
-				else {
+					sleep(5000);
+					speedPid.setWantSpeed(15);
+				} else {
 					speedPid.kill();
 				}
 
@@ -241,7 +243,7 @@ public class Control extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				display5.setText(speedPid.integral + "");
+
 			}
 		});
 
@@ -488,12 +490,6 @@ public class Control extends Activity {
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
-
-	@Override
-	protected void onPause() {
-		super.onDestroy();
-		finish();
-	}
 
 	@Override
 	protected void onDestroy() {

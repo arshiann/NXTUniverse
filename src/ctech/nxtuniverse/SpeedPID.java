@@ -1,80 +1,79 @@
 package ctech.nxtuniverse;
 
+import android.util.Log;
+
 public class SpeedPID extends Thread {
 
-	double kp = 100;
-	double ki = 0;
-	double kd = 0;
+	SpeedPID() {
+//		setWantSpeed(wantSpeed);
+		this.active = true;
+	}
 
-	double speedError;
-	double integral = 0;
-	double derivative;
+	// Remove static if necessary
+	static double kp = 3;
+	static double ki = 0;
+	static double kd = 0;
 
-	double oldSpeedError = 0;
-
-	int motorRotationCount;
-	int oldMotorRotationCount = 0;
-
-	double outputSubtotal;
-	int output;
-
-	double wantSpeed = 0.5; // Measured in m/s
-
-	boolean active = true;
-
-	long time = 0; // XXX Pseudo time
-	long oldTime = 0; // XXX Pseudo old time
+	private double wantSpeed = 3; // Measured in cm/s
+	private volatile boolean active = false; // XXX change it to true
 
 	public void run() {
+
+		double speedError = 0;
+		double integral = 0;
+		double derivative = 0;
+
+		double motorRotationCount;
+
+		// double oldSpeedError = 0;
+		double oldMotorRotationCount = 0;
+
+		int output = 0;
+
+		long time;
+		long oldTime = 0;
+
 		byte[] motor = Control.motorDataStructure;
-		
-		byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03,
-				0x0B, 0x02, (byte) 0xFA, 0x00 };
-//		Control.write(confirmationTone);
-		
+		long startTime;
+
 		while (active) {
-			
-			
-
-
+			startTime = System.currentTimeMillis();
 			// get value form NXT
 			int[] tempMotorRotationCount = Control.getMotorRotationCount();
 
-			
-			
 			// setting right motor value
 			motorRotationCount = tempMotorRotationCount[0];
+			Log.i("motor count", String.valueOf(motorRotationCount));
+			Log.i("old motor count", String.valueOf(oldMotorRotationCount));
+//			Control.resetMotorCount();
 
-			oldTime = time; // XXX Pseudo time
 			time = System.currentTimeMillis();
 
-			// Converting rotation to m/s
+			// Converting rotation to cm/s
 
-			double motorSpeed = ((double) (motorRotationCount - oldMotorRotationCount) / (double) 2500)
-					/ (time - oldTime); // XXX Pseudo time
-			// motor speed = { (rotation)*25*100 } / dt
-			// 25 rotation = 1 cm
-			// 100 cm = 1 m
-			// delta t = old time - current time
-			
+			double motorSpeed = ((motorRotationCount - oldMotorRotationCount) / 25)
+					/ ((double) (time - oldTime) / 1000);
+			Log.i("speed", String.valueOf(motorSpeed));
+
 			// PID Calculation
 			speedError = wantSpeed - motorSpeed;
 
-			integral += speedError * (time - oldTime) ; // XXX Pseudo time
+			// integral += speedError * (time - oldTime) ; //
+			//
+			// if (integral > 100) {
+			// integral = 100;
+			// } else if (integral < -100) {
+			// integral = -100;
+			// }
+			//
+			// derivative = (speedError - oldSpeedError) / (time - oldTime); //
 
-			if (integral > 100) {
-				integral = 100;
-			} else if (integral < -100) {
-				integral = -100;
-			}
-
-			derivative = (speedError - oldSpeedError) / (time - oldTime); // XXX
-																			// Pseudo
-																			// time
 			// End of PID Calculation
 
-			// Value im m/s
-			output = (int) ((kp * speedError) + (ki * integral) + (kd * derivative));
+			// Value in cm/s
+			output += (int) ((kp * speedError) + (ki * integral) + (kd * derivative));
+
+			Log.i("output power", String.valueOf(output));
 
 			// Limiting final output power
 			if (output > 100) {
@@ -87,37 +86,29 @@ public class SpeedPID extends Thread {
 			motor[19] = (byte) output;
 			Control.write(motor);
 
-			// XXX get output power from (m/s) or (rotations)
-			// output = (int) outputInRotation;
-
-			oldSpeedError = speedError;
+			// oldSpeedError = speedError;
 			oldTime = time;
 			oldMotorRotationCount = motorRotationCount;
-			
-			try {
-				Thread.sleep(500);
-			} catch (Exception e) {
-				e.printStackTrace();
+
+			long timeElapsed = System.currentTimeMillis() - startTime;
+
+			if (timeElapsed < 250) {
+				try {
+					Thread.sleep(250 - timeElapsed);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			
-			// long timeElapsed = System.currentTimeMillis() - startTime;
-			//
-			// if (timeElapsed < 250) {
-			// try {
-			// Thread.sleep(250 - timeElapsed);
-			// } catch (Exception e) {
-			// e.printStackTrace();
-			// }
-			// }
-
-			// Control.display5.setText(time + " s");
-
 		}
 
 		motor[5] = (byte) 0;
 		motor[19] = (byte) 0;
 		Control.write(motor);
 
+	}
+
+	public void setWantSpeed(double wantSpeed) {
+		this.wantSpeed = wantSpeed;
 	}
 
 	public void kill() {

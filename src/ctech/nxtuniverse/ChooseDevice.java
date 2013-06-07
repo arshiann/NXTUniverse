@@ -67,21 +67,9 @@ public class ChooseDevice extends Activity {
 
 	ListView pairedList, newRobotList;
 
-	protected void onStart(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Button scanButton = (Button) findViewById(R.id.button_scan);
 
-		scanButton.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				doDiscovery();
-				v.setVisibility(View.GONE);
 
-			}
-		});
-	}
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -103,6 +91,7 @@ public class ChooseDevice extends Activity {
 
 		pairedList = (ListView) findViewById(R.id.paired_devices);
 		pairedList.setAdapter(pairedRobot);
+		
 		pairedList.setOnItemClickListener(clickListener);
 
 		newRobotList = (ListView) findViewById(R.id.new_devices);
@@ -110,10 +99,10 @@ public class ChooseDevice extends Activity {
 		newRobotList.setOnItemClickListener(clickListener);
 
 		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-		this.registerReceiver(mReceiver, filter);
+//		this.registerReceiver(mReceiver, filter);
 
 		filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-		this.registerReceiver(mReceiver, filter);
+//		this.registerReceiver(mReceiver, filter);
 
 		mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -137,6 +126,30 @@ public class ChooseDevice extends Activity {
 		}
 	}
 
+	protected void onStart(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Button scanButton = (Button) findViewById(R.id.button_scan);
+
+		scanButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				doDiscovery();
+				v.setVisibility(View.GONE);
+
+			}
+		});
+	}
+	
+	
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -181,9 +194,9 @@ public class ChooseDevice extends Activity {
 
 			// //////////
 
-			BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-
-			BluetoothSocket socket;
+			BluetoothAdapter adapter = MainActivity.adapter;
+			
+			BluetoothSocket socket = MainActivity.socket;
 
 			OutputStream outStream = MainActivity.outStream;
 			InputStream inStream = MainActivity.inStream;
@@ -211,7 +224,6 @@ public class ChooseDevice extends Activity {
 
 			// ////////
 
-			finish();
 		}
 	};
 
