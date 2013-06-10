@@ -1,19 +1,20 @@
 package ctech.nxtuniverse;
 
+import android.util.Log;
+
 public class DistancePID extends Thread {
-	
+
 	DistancePID(int wantPosition) {
 		setWantPosition(wantPosition);
 		this.active = true;
 	}
-	
-	// Remove static if necessary
-	static double kp = 5;
-	static double ki = 0;
-	static double kd = 0;
+
+	private double kp = 5;
+	private double ki = 0;
+	private double kd = 0;
 
 	private int wantPosition; // Measured in cm
-	private volatile boolean active = false; // XXX change it back to true
+	private volatile boolean active = false;
 
 	public void run() {
 
@@ -25,9 +26,11 @@ public class DistancePID extends Thread {
 
 		double oldError = 0;
 
+		//XXX Output should be Int
 		double output = 0;
-
-		byte[] motor = Control.motorDataStructure;
+		double outputLimit = 100;
+		
+		byte[] motor = Control.motorData;
 		// long startTime = System.currentTimeMillis();
 		long startTime;
 
@@ -35,6 +38,7 @@ public class DistancePID extends Thread {
 			startTime = System.currentTimeMillis();
 
 			actualPosition = Control.readDistance();
+			Log.i("Actual Position", String.valueOf(actualPosition));
 
 			// DistancePID calculation
 			distanceError = wantPosition - actualPosition;
@@ -50,11 +54,12 @@ public class DistancePID extends Thread {
 			// DistancePID calculation ends
 
 			output = ((kp * distanceError) + (ki * integral) + (kd * derivative));
-
-			if (output > 100) {
-				output = 100;
-			} else if (output < -100) {
-				output = -100;
+			Log.i("Output", String.valueOf(output));
+			
+			if (output > outputLimit) {
+				output = outputLimit;
+			} else if (output < -outputLimit) {
+				output = -outputLimit;
 			}
 
 			motor[5] = (byte) -output;

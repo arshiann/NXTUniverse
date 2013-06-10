@@ -5,7 +5,7 @@ import android.util.Log;
 public class SpeedPID extends Thread {
 
 	SpeedPID() {
-//		setWantSpeed(wantSpeed);
+		// setWantSpeed(wantSpeed);
 		this.active = true;
 	}
 
@@ -33,7 +33,7 @@ public class SpeedPID extends Thread {
 		long time;
 		long oldTime = 0;
 
-		byte[] motor = Control.motorDataStructure;
+		byte[] motor = Control.motorData;
 		long startTime;
 
 		while (active) {
@@ -43,9 +43,9 @@ public class SpeedPID extends Thread {
 
 			// setting right motor value
 			motorRotationCount = tempMotorRotationCount[0];
-			Log.i("motor count", String.valueOf(motorRotationCount));
-			Log.i("old motor count", String.valueOf(oldMotorRotationCount));
-//			Control.resetMotorCount();
+			Log.i("Motor rotation", String.valueOf(motorRotationCount));
+			Log.i("Old motor rotation", String.valueOf(oldMotorRotationCount));
+			// Control.resetMotorCount();
 
 			time = System.currentTimeMillis();
 
@@ -53,7 +53,7 @@ public class SpeedPID extends Thread {
 
 			double motorSpeed = ((motorRotationCount - oldMotorRotationCount) / 25)
 					/ ((double) (time - oldTime) / 1000);
-			Log.i("speed", String.valueOf(motorSpeed));
+			Log.i("Speed", String.valueOf(motorSpeed));
 
 			// PID Calculation
 			speedError = wantSpeed - motorSpeed;
@@ -73,7 +73,7 @@ public class SpeedPID extends Thread {
 			// Value in cm/s
 			output += (int) ((kp * speedError) + (ki * integral) + (kd * derivative));
 
-			Log.i("output power", String.valueOf(output));
+			Log.i("Output power", String.valueOf(output));
 
 			// Limiting final output power
 			if (output > 100) {

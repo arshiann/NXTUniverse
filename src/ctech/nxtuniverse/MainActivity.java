@@ -9,22 +9,21 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ToggleButton;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-//import android.view.Menu;
 import android.content.Intent;
 
 public class MainActivity extends Activity {
 
-	// Buttons and images
-	Button connect, disconnect, control, about, scanDevice;
-	// ToggleButton bluetooth;
-	ImageView xImage, bluetooth;
+	// Buttons
+	private Button connect, disconnect, control, about;
+	
+	// Images
+	private ImageView xImage, bluetooth;
 
-	// Declaring
+	// Bluetooth I/O
 	public static BluetoothAdapter adapter = BluetoothAdapter
 			.getDefaultAdapter();
 	public static BluetoothSocket socket;
@@ -44,17 +43,15 @@ public class MainActivity extends Activity {
 		bluetooth = (ImageView) findViewById(R.id.image_bluetooth);
 
 		// Buttons
-		// bluetooth = (ToggleButton) findViewById(R.id.bluetooth);
 		connect = (Button) findViewById(R.id.connect);
 		disconnect = (Button) findViewById(R.id.disconnect);
 		control = (Button) findViewById(R.id.control);
 		about = (Button) findViewById(R.id.about);
-		scanDevice = (Button) findViewById(R.id.scan);
 
-		// XXX new bluetooth apparatus
-		if (adapter.isEnabled()) {
+		// Sets alive/dead Bluetooth logo
+		if (adapter.isEnabled()) { // If Bluetooth is on, set alive logo
 			bluetooth.setImageResource(R.drawable.bluetooth_alive);
-		} else {
+		} else { // Else, set dead logo
 			bluetooth.setImageResource(R.drawable.bluetooth_dead);
 		}
 
@@ -63,29 +60,27 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				boolean enabling = false;
+				// To synchronize Bluetooth of the Android device and the image
+//				boolean enabling = false;
+
 				if (adapter.isEnabled()) {
 					adapter.disable();
+					while (adapter.isEnabled()) {
+						// Empty while loop.
+						// Purpose: wait until Bluetooth on the Android device
+						// is disabled.
+					}
 					bluetooth.setImageResource(R.drawable.bluetooth_dead);
 				} else {
-					enabling = true;
+//					enabling = true;
 					adapter.enable();
-				}
-
-				if (enabling) {
 					while (!adapter.isEnabled()) {
+						// Empty while loop.
+						// Purpose: wait until Bluetooth on the Android device
+						// is enabled.
 					}
 					bluetooth.setImageResource(R.drawable.bluetooth_alive);
 				}
-			}
-		});
-
-		scanDevice.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent startScan = new Intent("android.intent.action.SCAN");
-				startActivity(startScan);
 			}
 		});
 
@@ -100,8 +95,10 @@ public class MainActivity extends Activity {
 					socket = nxt.createRfcommSocketToServiceRecord(UUID
 							.fromString("00001101-0000-1000-8000-00805F9B34FB"));
 					socket.connect();
-					outStream = MainActivity.socket.getOutputStream();
-					inStream = MainActivity.socket.getInputStream();
+
+					// MainActivity removed
+					outStream = socket.getOutputStream();
+					inStream = socket.getInputStream();
 
 					// Play the
 
@@ -115,9 +112,9 @@ public class MainActivity extends Activity {
 				}
 
 				if (success) {
-					xImage.setImageResource(R.drawable.green);
+					xImage.setImageResource(R.drawable.connection_connected);
 				} else {
-					xImage.setImageResource(R.drawable.red);
+					xImage.setImageResource(R.drawable.connection_disconnected);
 				}
 			}
 		});
@@ -136,9 +133,9 @@ public class MainActivity extends Activity {
 				}
 
 				if (success) {
-					xImage.setImageResource(R.drawable.red);
+					xImage.setImageResource(R.drawable.connection_disconnected);
 				} else {
-					xImage.setImageResource(R.drawable.green);
+					xImage.setImageResource(R.drawable.connection_connected);
 				}
 			}
 		});
@@ -152,28 +149,6 @@ public class MainActivity extends Activity {
 				startActivity(startControl);
 			}
 		});
-
-		// bluetooth.setOnClickListener(new View.OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// localAdapter.enable();
-		// }
-		// });
-
-		// bluetooth
-		// .setOnCheckedChangeListener(new
-		// CompoundButton.OnCheckedChangeListener() {
-		// public void onChecketacodChanged(CompoundButton buttonView, boolean
-		// isOn) {
-		//
-		// if (isOn) {
-		// adapter.enable();
-		// } else {
-		// adapter.disable();
-		// }
-		// }
-		// });
 
 		about.setOnClickListener(new View.OnClickListener() {
 

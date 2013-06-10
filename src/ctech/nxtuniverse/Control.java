@@ -16,61 +16,26 @@ public class Control extends Activity {
 
 	// Global objects
 	// Buttons
-	static Button readDistance, getMotorStatus, resetMotorCount;
-	static Button test, test2, test3, test4;
-	static Button forward, backward, left, right;
+	protected Button readDistance, getMotorStatus, resetMotorCount;
+	protected Button test, test2, test3, test4;
+	protected Button forward, backward, left, right;
 
 	// Text displays
 	public static TextView display1, display2, display3, display4, display5;
 
 	// Value classes to access NXT direct command codes
-	static CustomValue Value = new CustomValue();
-	static kNXTValue kNXTvalue = new kNXTValue();
+//	static CustomValue Value = new CustomValue();
 
-	// Communication - In and Out Stream
+	// Bluetooth Communication - In and Out Stream
 	static OutputStream outStream = MainActivity.outStream;
 	static InputStream inStream = MainActivity.inStream;
 
 	// Ports on NXT device - Define ports
-	static byte rightMotorPort = Value.getMotorA();
-	static byte leftMotorPort = Value.getMotorB();
-	static byte ultrasonicSensorPort = Value.getSensor4();
+	static byte rightMotorPort = NXTValue.PORT_MOTOR_A;
+	static byte leftMotorPort = NXTValue.PORT_MOTOR_B;
+	static byte ultrasonicSensorPort = NXTValue.PORT_SENSOR_4;
 
-	static byte[] motorDataStructure = new byte[28];
-	{
-		motorDataStructure[0] = 0x0c; // length (from byte 2 to 13 inclusive)
-		motorDataStructure[1] = 0x00; // start from byte 2
-		motorDataStructure[2] = (byte) 0x80; // return type
-		motorDataStructure[3] = 0x04; // setOutputState
-		motorDataStructure[4] = rightMotorPort; // port
-		motorDataStructure[5] = (byte) 0; // power
-		motorDataStructure[6] = 0x07; // XXX unknown predefined value
-		motorDataStructure[7] = 0x02; // motor regulation
-		motorDataStructure[8] = (byte) 0; // turn ratio
-		// ratio between power supply
-		motorDataStructure[9] = Value.getMotorRunStateRunning();
-		motorDataStructure[10] = 0x00;// taco limit
-		motorDataStructure[11] = 0x00;// taco limit
-		motorDataStructure[12] = 0x00;// taco limit
-		motorDataStructure[13] = 0x00;// taco limit
-
-		// left motor
-		motorDataStructure[14] = 0x0c; // length (from byte 16 to 27 inclusive)
-		motorDataStructure[15] = 0x00; // start from byte 2
-		motorDataStructure[16] = (byte) 0x80; // return type
-		motorDataStructure[17] = 0x04; // setOutputState
-		motorDataStructure[18] = leftMotorPort; // port
-		motorDataStructure[19] = (byte) 0; // power
-		motorDataStructure[20] = 0x07; // XXX unknown predefined value
-		motorDataStructure[21] = 0x00; // motor regulation
-		motorDataStructure[22] = (byte) 0; // turn ratio
-		motorDataStructure[23] = Value.getMotorRunStateRunning();
-		motorDataStructure[24] = 0x00;// taco limit
-		motorDataStructure[25] = 0x00;// taco limit
-		motorDataStructure[26] = 0x00;// taco limit
-		motorDataStructure[27] = 0x00;// tacoString numS limit
-
-	}
+	static byte[] motorData = new byte[28];
 
 	static DistancePID distancePid;
 	static SpeedPID speedPid;
@@ -80,7 +45,6 @@ public class Control extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control);
 
-		// onCreate - Linking layout XML to current java file
 		// Text display
 		display1 = (TextView) findViewById(R.id.display1);
 		display2 = (TextView) findViewById(R.id.display2);
@@ -107,15 +71,48 @@ public class Control extends Activity {
 		test3 = (Button) findViewById(R.id.button_test3);
 		test4 = (Button) findViewById(R.id.button_test4);
 
+//		// Motor data structure
+//		// Right motor
+//		motorData[0] = 0x0c; // Length (from byte 2 to 13 inclusive)
+//		motorData[1] = 0x00; // Start from byte 2
+//		motorData[2] = (byte) 0x80; // Return type (void)
+//		motorData[3] = 0x04; // setOutputState
+//		motorData[4] = rightMotorPort; // Port
+//		motorData[5] = (byte) 0; // Power
+//		motorData[6] = 0x07; // Mode byte (unknown value)
+//		motorData[7] = 0x02; // Motor regulation (sync)
+//		motorData[8] = (byte) 0; // Turn ratio
+//		motorData[9] = Value.getMotorRunStateRunning(); // Run state
+//		motorData[10] = 0x00; // Tacho limit
+//		motorData[11] = 0x00; // Tacho limit
+//		motorData[12] = 0x00; // Tacho limit
+//		motorData[13] = 0x00; // Tacho limit
+//
+//		// Left motor
+//		motorData[14] = 0x0c; // Length (from byte 2 to 13 inclusive)
+//		motorData[15] = 0x00; // Start from byte 2
+//		motorData[16] = (byte) 0x80; // Return type (void)
+//		motorData[17] = 0x04; // setOutputState
+//		motorData[18] = leftMotorPort; // Port
+//		motorData[19] = (byte) 0; // Power
+//		motorData[20] = 0x07; // Mode byte (unknown value)
+//		motorData[21] = 0x02; // Motor regulation (sync)
+//		motorData[22] = (byte) 0; // Turn ratio
+//		motorData[23] = Value.getMotorRunStateRunning(); // Run state
+//		motorData[24] = 0x00; // Tacho limit
+//		motorData[25] = 0x00; // Tacho limit
+//		motorData[26] = 0x00; // Tacho limit
+//		motorData[27] = 0x00; // Tacho limit
+
 		// Setting up sensors
 		try {
 			// Ultrasonic sensor
 			byte[] ultrasonicSetupCommand = { 0x05, 0x00,
-					Value.getNullReturn(), Value.getSetInputMode(),
-					ultrasonicSensorPort, Value.getLowSpeed9V(),
-					Value.getRawMode() };
+					NXTValue.RETURN_VOID, NXTValue.SET_INPUT_MODE,
+					ultrasonicSensorPort, NXTValue.SENSOR_TYPE_LOW_SPEED_9V,
+					NXTValue.SENSOR_MODE_RAW };
 			write(ultrasonicSetupCommand);
-			write(Value.setContinuous);
+			write(NXTValue.SET_CONTINUOUS);
 			// End of ultrasonic sensor setup
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -123,7 +120,7 @@ public class Control extends Activity {
 		}
 		// End of sensors setup
 
-		// Assigning task(s) to buttons
+		// Defining task(s) to buttons
 		resetMotorCount.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -147,9 +144,9 @@ public class Control extends Activity {
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
 				if (action == MotionEvent.ACTION_DOWN) {
-					move(Value.getGoForward());
+					move(NXTValue.GO_FORWARD);
 				} else if (action == MotionEvent.ACTION_UP) {
-					move(Value.getStop());
+					move(NXTValue.STOP);
 				}
 				return true;
 			}
@@ -161,9 +158,9 @@ public class Control extends Activity {
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
 				if (action == MotionEvent.ACTION_DOWN) {
-					move(Value.getGoBackward());
+					move(NXTValue.GO_BACKWARD);
 				} else if (action == MotionEvent.ACTION_UP) {
-					move(Value.getStop());
+					move(NXTValue.STOP);
 				}
 				return true;
 			}
@@ -175,9 +172,9 @@ public class Control extends Activity {
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
 				if (action == MotionEvent.ACTION_DOWN) {
-					move(Value.getTurnRight());
+					move(NXTValue.TURN_RIGHT);
 				} else if (action == MotionEvent.ACTION_UP) {
-					move(Value.getStop());
+					move(NXTValue.STOP);
 				}
 				return true;
 			}
@@ -189,9 +186,9 @@ public class Control extends Activity {
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
 				if (action == MotionEvent.ACTION_DOWN) {
-					move(Value.getTurnLeft());
+					move(NXTValue.TURN_LEFT);
 				} else if (action == MotionEvent.ACTION_UP) {
-					move(Value.getStop());
+					move(NXTValue.STOP);
 				}
 				return true;
 			}
@@ -211,7 +208,7 @@ public class Control extends Activity {
 
 				if (distancePid == null) {
 					distancePid = new DistancePID(50);
-//					distancePid.setWantPosition(50);
+					// distancePid.setWantPosition(50);
 					distancePid.start();
 					test.setText("Running");
 				} else {
@@ -262,9 +259,9 @@ public class Control extends Activity {
 	// Methods
 
 	public static int[] getMotorRotationCount() {
-		byte[] rightMotorCommand = { 0x03, 0x00, Value.getReturnStatus(), 0x06,
+		byte[] rightMotorCommand = { 0x03, 0x00, NXTValue.RETURN_STATUS, 0x06,
 				rightMotorPort };
-		byte[] leftMotorCommand = { 0x03, 0x00, Value.getReturnStatus(), 0x06,
+		byte[] leftMotorCommand = { 0x03, 0x00, NXTValue.RETURN_STATUS, 0x06,
 				leftMotorPort };
 
 		write(rightMotorCommand);
@@ -330,9 +327,9 @@ public class Control extends Activity {
 	 * Reset motor count
 	 */
 	public static void resetMotorCount() {
-		byte[] rightMotorCommand = { 0x04, 0x00, Value.getNullReturn(), 0x0A,
+		byte[] rightMotorCommand = { 0x04, 0x00, NXTValue.RETURN_VOID, 0x0A,
 				rightMotorPort, 1 }; // 1 is boolean true in byte
-		byte[] leftMotorCommand = { 0x04, 0x00, Value.getNullReturn(), 0x0A,
+		byte[] leftMotorCommand = { 0x04, 0x00, NXTValue.RETURN_VOID, 0x0A,
 				leftMotorPort, 1 };
 
 		write(rightMotorCommand);
@@ -392,20 +389,20 @@ public class Control extends Activity {
 
 		int power = 100;
 
-		byte[] motor = motorDataStructure;
+		byte[] motor = motorData;
 
-		if (direction == Value.getGoForward()) {
+		if (direction == NXTValue.GO_FORWARD) {
 			motor[5] = (byte) power;
 			motor[19] = (byte) power;
-		} else if (direction == Value.getGoBackward()) {
+		} else if (direction == NXTValue.GO_BACKWARD) {
 			motor[5] = (byte) -power;
 			motor[19] = (byte) -power;
-		} else if (direction == Value.getTurnRight()) {
+		} else if (direction == NXTValue.TURN_RIGHT) {
 			motor[5] = (byte) -power;
 			motor[7] = 0x00;
 			motor[19] = (byte) power;
 			motor[21] = 0x00;
-		} else if (direction == Value.getTurnLeft()) {
+		} else if (direction == NXTValue.TURN_LEFT) {
 			motor[5] = (byte) power;
 			motor[7] = 0x00;
 			motor[19] = (byte) -power;
