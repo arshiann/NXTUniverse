@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 
 	// Buttons
 	private Button connect, disconnect, control, about;
-	
+
 	// Images
 	private ImageView xImage, bluetooth;
 
@@ -54,6 +54,11 @@ public class MainActivity extends Activity {
 		} else { // Else, set dead logo
 			bluetooth.setImageResource(R.drawable.bluetooth_dead);
 		}
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 
 		// Assigning task to buttons
 		bluetooth.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +66,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// To synchronize Bluetooth of the Android device and the image
-//				boolean enabling = false;
+				// boolean enabling = false;
 
 				if (adapter.isEnabled()) {
 					adapter.disable();
@@ -72,7 +77,7 @@ public class MainActivity extends Activity {
 					}
 					bluetooth.setImageResource(R.drawable.bluetooth_dead);
 				} else {
-//					enabling = true;
+					// enabling = true;
 					adapter.enable();
 					while (!adapter.isEnabled()) {
 						// Empty while loop.
@@ -96,12 +101,11 @@ public class MainActivity extends Activity {
 							.fromString("00001101-0000-1000-8000-00805F9B34FB"));
 					socket.connect();
 
-					// MainActivity removed
+					// Note the preference after removing MainActivity
 					outStream = socket.getOutputStream();
 					inStream = socket.getInputStream();
 
-					// Play the
-
+					// Play the confirmation tone on the NXT device
 					byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03,
 							0x0B, 0x02, (byte) 0xFA, 0x00 };
 					outStream.write(confirmationTone);
@@ -158,7 +162,6 @@ public class MainActivity extends Activity {
 				startActivity(startAbout);
 			}
 		});
-
 	}
 
 	@Override

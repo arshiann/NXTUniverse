@@ -2,11 +2,9 @@ package ctech.nxtuniverse;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.Thread.State;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -14,29 +12,27 @@ import android.widget.TextView;
 
 public class Control extends Activity {
 
-	// Global objects
 	// Buttons
-	protected Button readDistance, getMotorStatus, resetMotorCount;
+	protected Button readDistance, getMotorPosition, resetMotorPosition;
 	protected Button test, test2, test3, test4;
 	protected Button forward, backward, left, right;
 
-	// Text displays
+	// Text Views
 	public static TextView display1, display2, display3, display4, display5;
 
-	// Value classes to access NXT direct command codes
-//	static CustomValue Value = new CustomValue();
-
-	// Bluetooth Communication - In and Out Stream
+	// Bluetooth Communication - In and Out Streams
 	static OutputStream outStream = MainActivity.outStream;
 	static InputStream inStream = MainActivity.inStream;
 
-	// Ports on NXT device - Define ports
-	static byte rightMotorPort = NXTValue.PORT_MOTOR_A;
-	static byte leftMotorPort = NXTValue.PORT_MOTOR_B;
-	static byte ultrasonicSensorPort = NXTValue.PORT_SENSOR_4;
+	// Defining ports of NXT device
+	static byte rightMotorPort = NXTValue.MOTOR_PORT_A;
+	static byte leftMotorPort = NXTValue.MOTOR_PORT_B;
+	static byte ultrasonicSensorPort = NXTValue.SENSOR_PORT_4;
 
-	static byte[] motorData = new byte[28];
+	// Motor data
+	static byte[] motorData = NXTValue.MOTOR_DATA;
 
+	// PID Controllers
 	static DistancePID distancePid;
 	static SpeedPID speedPid;
 
@@ -45,7 +41,7 @@ public class Control extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control);
 
-		// Text display
+		// Text Views
 		display1 = (TextView) findViewById(R.id.display1);
 		display2 = (TextView) findViewById(R.id.display2);
 		display3 = (TextView) findViewById(R.id.display3);
@@ -55,9 +51,9 @@ public class Control extends Activity {
 		// Distance listener button
 		readDistance = (Button) findViewById(R.id.distanceListener);
 
-		// Motor count buttons
-		getMotorStatus = (Button) findViewById(R.id.motorCount);
-		resetMotorCount = (Button) findViewById(R.id.resetCount);
+		// Motor related buttons
+		getMotorPosition = (Button) findViewById(R.id.motorCount);
+		resetMotorPosition = (Button) findViewById(R.id.resetCount);
 
 		// Primary navigation buttons
 		forward = (Button) findViewById(R.id.forward);
@@ -71,69 +67,41 @@ public class Control extends Activity {
 		test3 = (Button) findViewById(R.id.button_test3);
 		test4 = (Button) findViewById(R.id.button_test4);
 
-//		// Motor data structure
-//		// Right motor
-//		motorData[0] = 0x0c; // Length (from byte 2 to 13 inclusive)
-//		motorData[1] = 0x00; // Start from byte 2
-//		motorData[2] = (byte) 0x80; // Return type (void)
-//		motorData[3] = 0x04; // setOutputState
-//		motorData[4] = rightMotorPort; // Port
-//		motorData[5] = (byte) 0; // Power
-//		motorData[6] = 0x07; // Mode byte (unknown value)
-//		motorData[7] = 0x02; // Motor regulation (sync)
-//		motorData[8] = (byte) 0; // Turn ratio
-//		motorData[9] = Value.getMotorRunStateRunning(); // Run state
-//		motorData[10] = 0x00; // Tacho limit
-//		motorData[11] = 0x00; // Tacho limit
-//		motorData[12] = 0x00; // Tacho limit
-//		motorData[13] = 0x00; // Tacho limit
-//
-//		// Left motor
-//		motorData[14] = 0x0c; // Length (from byte 2 to 13 inclusive)
-//		motorData[15] = 0x00; // Start from byte 2
-//		motorData[16] = (byte) 0x80; // Return type (void)
-//		motorData[17] = 0x04; // setOutputState
-//		motorData[18] = leftMotorPort; // Port
-//		motorData[19] = (byte) 0; // Power
-//		motorData[20] = 0x07; // Mode byte (unknown value)
-//		motorData[21] = 0x02; // Motor regulation (sync)
-//		motorData[22] = (byte) 0; // Turn ratio
-//		motorData[23] = Value.getMotorRunStateRunning(); // Run state
-//		motorData[24] = 0x00; // Tacho limit
-//		motorData[25] = 0x00; // Tacho limit
-//		motorData[26] = 0x00; // Tacho limit
-//		motorData[27] = 0x00; // Tacho limit
-
 		// Setting up sensors
 		try {
 			// Ultrasonic sensor
-			byte[] ultrasonicSetupCommand = { 0x05, 0x00,
-					NXTValue.RETURN_VOID, NXTValue.SET_INPUT_MODE,
-					ultrasonicSensorPort, NXTValue.SENSOR_TYPE_LOW_SPEED_9V,
-					NXTValue.SENSOR_MODE_RAW };
+			byte[] ultrasonicSetupCommand = { 0x05, 0x00, NXTValue.RETURN_VOID,
+					NXTValue.SET_INPUT_MODE, ultrasonicSensorPort,
+					NXTValue.SENSOR_TYPE_LOW_SPEED_9V, NXTValue.SENSOR_MODE_RAW };
 			write(ultrasonicSetupCommand);
 			write(NXTValue.SET_CONTINUOUS);
-			// End of ultrasonic sensor setup
 		} catch (Exception e) {
 			e.printStackTrace();
 			display5.setText("Setup error");
 		}
 		// End of sensors setup
+	}
+
+	// End of onCreate
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 
 		// Defining task(s) to buttons
-		resetMotorCount.setOnClickListener(new View.OnClickListener() {
+		resetMotorPosition.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				resetMotorCount();
+				resetMotorPosition();
 			}
 		});
 
-		getMotorStatus.setOnClickListener(new View.OnClickListener() {
+		getMotorPosition.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				display1.setText(intArrayToString(getMotorRotationCount())
+				display1.setText(intArrayToString(getMotorPosition())
 						+ " rotation");
 			}
 		});
@@ -143,9 +111,9 @@ public class Control extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) {
+				if (action == MotionEvent.ACTION_DOWN) { // button is touched
 					move(NXTValue.GO_FORWARD);
-				} else if (action == MotionEvent.ACTION_UP) {
+				} else if (action == MotionEvent.ACTION_UP) { // is not touched
 					move(NXTValue.STOP);
 				}
 				return true;
@@ -157,9 +125,9 @@ public class Control extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) {
+				if (action == MotionEvent.ACTION_DOWN) { // button is touched
 					move(NXTValue.GO_BACKWARD);
-				} else if (action == MotionEvent.ACTION_UP) {
+				} else if (action == MotionEvent.ACTION_UP) { // is not touched
 					move(NXTValue.STOP);
 				}
 				return true;
@@ -171,9 +139,9 @@ public class Control extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) {
+				if (action == MotionEvent.ACTION_DOWN) { // button is touched
 					move(NXTValue.TURN_RIGHT);
-				} else if (action == MotionEvent.ACTION_UP) {
+				} else if (action == MotionEvent.ACTION_UP) { // is not touched
 					move(NXTValue.STOP);
 				}
 				return true;
@@ -185,9 +153,9 @@ public class Control extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) {
+				if (action == MotionEvent.ACTION_DOWN) { // button is touched
 					move(NXTValue.TURN_LEFT);
-				} else if (action == MotionEvent.ACTION_UP) {
+				} else if (action == MotionEvent.ACTION_UP) { // is not touched
 					move(NXTValue.STOP);
 				}
 				return true;
@@ -224,8 +192,7 @@ public class Control extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				if (speedPid == null) {
-					speedPid = new SpeedPID();
-					speedPid.setWantSpeed(3);
+					speedPid = new SpeedPID(3);
 					speedPid.start();
 					sleep(5000);
 					speedPid.setWantSpeed(15);
@@ -251,14 +218,18 @@ public class Control extends Activity {
 
 			}
 		});
-
 	}
 
-	// End of onCreate
+	// End of onStart
 
 	// Methods
-
-	public static int[] getMotorRotationCount() {
+	/**
+	 * Returns a byte array with the right motor's position at index 0 and the
+	 * left motor's position at index 1.
+	 * 
+	 * @return Byte array [right motor's position, left motor's position]
+	 */
+	public static int[] getMotorPosition() {
 		byte[] rightMotorCommand = { 0x03, 0x00, NXTValue.RETURN_STATUS, 0x06,
 				rightMotorPort };
 		byte[] leftMotorCommand = { 0x03, 0x00, NXTValue.RETURN_STATUS, 0x06,
@@ -280,6 +251,7 @@ public class Control extends Activity {
 			value[1] = input5[19] + (input5[20] << 8) + (input5[21] << 16)
 					+ (input5[22] << 24);
 		} catch (Exception e) {
+			// Returning 255 in case of an error
 			value[0] = 255;
 			value[1] = 255;
 		}
@@ -324,22 +296,23 @@ public class Control extends Activity {
 	}
 
 	/**
-	 * Reset motor count
+	 * Resets both right and left motor's position
 	 */
-	public static void resetMotorCount() {
-		byte[] rightMotorCommand = { 0x04, 0x00, NXTValue.RETURN_VOID, 0x0A,
+	public static void resetMotorPosition() {
+		byte[] dataForRightMotor = { 0x04, 0x00, NXTValue.RETURN_VOID, 0x0A,
 				rightMotorPort, 1 }; // 1 is boolean true in byte
-		byte[] leftMotorCommand = { 0x04, 0x00, NXTValue.RETURN_VOID, 0x0A,
+		byte[] dataForleftMotor = { 0x04, 0x00, NXTValue.RETURN_VOID, 0x0A,
 				leftMotorPort, 1 };
 
-		write(rightMotorCommand);
-		write(leftMotorCommand);
+		write(dataForRightMotor);
+		write(dataForleftMotor);
 	}
 
 	/**
-	 * Reads the distance from NXT ultrasonic sensor
+	 * This method will first request NXT for ultrasonic sensor's data. Then,
+	 * this method will return the distance (measured in cm)
 	 * 
-	 * @return Distance in cm
+	 * @return int - Distance in cm
 	 */
 	public static int readDistance() {
 		// Data and scope
@@ -357,6 +330,7 @@ public class Control extends Activity {
 		try {
 			write(readByteZero);
 			sleep(100);
+
 			// Clearing NXT buffer for further reading
 			input1 = read();
 
@@ -366,7 +340,7 @@ public class Control extends Activity {
 				input2 = read();
 			} while (input2[5] == 0);
 
-			// Ask NXT to reply with data
+			// Request NXT to reply with ultrasonic sensor's data
 			write(readLS);
 
 			// Reading data form NXT
@@ -376,14 +350,18 @@ public class Control extends Activity {
 			return input3[6];
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			// In case of an error, return 255
 			return 255;
 		}
 	}
 
 	/**
+	 * Simple navigating method. Describe the direction in parameter using
+	 * constants from NXTValue class.
 	 * 
-	 * @param direction
-	 *            - Refer to the Custom Value class
+	 * @param Direction
+	 *            - Constants from NXTValue class
 	 */
 	public static void move(int direction) {
 
@@ -391,6 +369,7 @@ public class Control extends Activity {
 
 		byte[] motor = motorData;
 
+		// Updating data based on what user wants
 		if (direction == NXTValue.GO_FORWARD) {
 			motor[5] = (byte) power;
 			motor[19] = (byte) power;
@@ -411,28 +390,32 @@ public class Control extends Activity {
 			motor[5] = (byte) 0;
 			motor[19] = (byte) 0;
 		}
+		
+		// Writing the data to NXT device
 		write(motor);
 	}
 
 	/**
-	 * Converts int array to string
+	 * Converts int array to a string.
 	 * 
-	 * @param array
-	 *            - The int array that will be converted into string.
-	 * @return The string version of the array.
+	 * @param Int
+	 *            array - The int array that will be converted into string.
+	 * @return The string representation of the array.
 	 */
 	public static String intArrayToString(int[] array) {
-		String stringArray = "";
+		String stringRepresentationOfTheArray = "";
+		
+		// Concatenating
 		for (int i = 0; i < array.length; i++) {
-			stringArray += array[i] + " ";
+			stringRepresentationOfTheArray += array[i] + ", ";
 		}
-		return stringArray;
+		return stringRepresentationOfTheArray;
 	}
 
 	/**
 	 * Wait before execution.
 	 * 
-	 * @param time
+	 * @param Time
 	 *            - Time in millisecond.
 	 */
 	public static void sleep(int time) {
@@ -440,15 +423,16 @@ public class Control extends Activity {
 			Thread.sleep(time);
 		} catch (Exception e) {
 			e.printStackTrace();
-			display5.setText("Wait error");
+			display5.setText("Wait error"); // XXX use alert dialog
 		}
 	}
 
 	/**
-	 * Read any size of data from the NXT buffer.
+	 * Reads and returns (in form of an int array) any size of data from the NXT
+	 * buffer.
 	 * 
-	 * @return Array of data [int] read from the NXT buffer. Returns 255 if
-	 *         buffer is empty or an error has occurred.
+	 * @return Int array - The message that is read from the NXT buffer. Returns
+	 *         255 if buffer is empty or an error has occurred.
 	 */
 	public static int[] read() {
 		int[] message;
@@ -464,16 +448,16 @@ public class Control extends Activity {
 			e.printStackTrace();
 			message = new int[1];
 			message[0] = 255;
-			display5.setText("Empty NXT buffer");
+			// display5.setText("Empty NXT buffer"); // XXX use alert dialog
 			return message;
 		}
 	}
 
 	/**
-	 * Write to the connected NXT device
+	 * Writes data to the NXT device.
 	 * 
-	 * @param data
-	 *            - Array of data that will be written on the NXT device
+	 * @param Data
+	 *            - Array of data that will be sent to the NXT device
 	 */
 	public static void write(byte[] data) {
 
@@ -482,11 +466,9 @@ public class Control extends Activity {
 			outStream.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
-			// display5.setText("Connection lost");
+			// display5.setText("Connection lost"); // XXX use alert dialog
 		}
 	}
-
-	// /////////////////////////////////////////////////////////////////////////
 
 	@Override
 	protected void onDestroy() {
