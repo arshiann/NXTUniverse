@@ -136,6 +136,9 @@ public class NXTValue {
 	public static final int TURN_RIGHT = 3;
 	public static final int TURN_LEFT = 4;
 
+	public static final int PID_MODE_DISTANCE = 1;
+	public static final int PID_MODE_SPEED = 2;
+
 	/**
 	 * Connection confirmation beep tone played on NXT device when Android
 	 * device is connected to the targeted NXT device
@@ -155,41 +158,41 @@ public class NXTValue {
 	// public static final byte[] READ_BYTE_ZERO = { 0x07, 0x00, 0x00, 0x0F,
 	// 0x03,
 	// 0x02, 0x01, 0x02, 0x42 };
-
-	/**
-	 * Byte array of data for two motors (right and left)
-	 */
-	public static byte[] MOTOR_DATA = {
-			// Right motor
-			0x0c, // Length (from byte 2 to 13 inclusive)
-			0x00, // Start from byte 2
-			(byte) RETURN_VOID, // Return type
-			0x04, // setOutputState
-			Control.rightMotorPort, // Port
-			(byte) 0, // Power
-			0x07, // Mode byte (unknown value)
-			MOTOR_REGULATION_SYNC, // Motor regulation
-			(byte) 0, // Turn ratio
-			MOTOR_RUNSTATE_RUNNING, // Run state
-			0x00, // Tacho limit
-			0x00, // Tacho limit
-			0x00, // Tacho limit
-			0x00, // Tacho limit
-
-			// Left motor
-			0x0c, // Length (from byte 2 to 13 inclusive)
-			0x00, // Start from byte 2
-			(byte) RETURN_VOID, // Return type
-			SET_OUTPUT_STATE, // Set Output State
-			Control.leftMotorPort, // Port
-			(byte) 0, // Power
-			0x07, // Mode byte (unknown value)
-			MOTOR_REGULATION_SYNC, // Motor regulation
-			(byte) 0, // Turn ratio
-			MOTOR_RUNSTATE_RUNNING, // Run state
-			0x00, // Tacho limit
-			0x00, // Tacho limit
-			0x00, // Tacho limit
-			0x00 // Tacho limit
-	};
+	//
+	// /**
+	// * Byte array of data for two motors (right and left)
+	// */
+	// public static byte[] MOTOR_DATA = {
+	// // Right motor
+	// 0x0c, // Length (from byte 2 to 13 inclusive)
+	// 0x00, // Start from byte 2
+	// (byte) RETURN_VOID, // Return type
+	// 0x04, // setOutputState
+	// Control.rightMotorPort, // Port
+	// (byte) 0, // Power
+	// 0x07, // Mode byte (unknown value)
+	// MOTOR_REGULATION_SYNC, // Motor regulation
+	// (byte) 0, // Turn ratio
+	// MOTOR_RUNSTATE_RUNNING, // Run state
+	// 0x00, // Tacho limit
+	// 0x00, // Tacho limit
+	// 0x00, // Tacho limit
+	// 0x00, // Tacho limit
+	//
+	// // Left motor
+	// 0x0c, // Length (from byte 2 to 13 inclusive)
+	// 0x00, // Start from byte 2
+	// (byte) RETURN_VOID, // Return type
+	// SET_OUTPUT_STATE, // Set Output State
+	// Control.leftMotorPort, // Port
+	// (byte) 0, // Power
+	// 0x07, // Mode byte (unknown value)
+	// MOTOR_REGULATION_SYNC, // Motor regulation
+	// (byte) 0, // Turn ratio
+	// MOTOR_RUNSTATE_RUNNING, // Run state
+	// 0x00, // Tacho limit
+	// 0x00, // Tacho limit
+	// 0x00, // Tacho limit
+	// 0x00 // Tacho limit
+	// };
 }

@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="ctech.nxtuniverse.MainActivity"
+            android:name="ctech.nxtuniverse.Activity_Main"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -27,31 +27,41 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ctech.nxtuniverse.About"
-            android:label="@string/app_name"
+            android:name="ctech.nxtuniverse.Activity_About"
+            android:label="About"
             android:screenOrientation="portrait" >
             <intent-filter>
-                <action android:name="android.intent.action.ABOUT" />
+                <action android:name="nxtuniverse.ABOUT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name="ctech.nxtuniverse.Control"
-            android:label="@string/app_name"
+            android:name="ctech.nxtuniverse.Activity_Control"
+            android:label="Mission Control"
             android:screenOrientation="portrait" >
             <intent-filter>
-                <action android:name="android.intent.action.CONTROL" />
+                <action android:name="nxtuniverse.CONTROL" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name="ctech.nxtuniverse.ChooseDevice"
-            android:label="@string/app_name"
+            android:name="ctech.nxtuniverse.Activity_Navigate"
+            android:label="Navigate"
             android:screenOrientation="portrait" >
             <intent-filter>
-                <action android:name="android.intent.action.SCAN" />
+                <action android:name="nxtuniverse.NAVIGATE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ctech.nxtuniverse.Activity_TiltToNavigate"
+             
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="nxtuniverse.TILT_NAVIGATE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

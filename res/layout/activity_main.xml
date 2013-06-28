@@ -6,86 +6,85 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    tools:context=".Activity_Main" >
 
     <Button
-        android:id="@+id/connect"
+        android:id="@+id/button_connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/textView1"
-        android:layout_below="@+id/xImage"
+        android:layout_below="@+id/imageView_xImage"
+        android:layout_toLeftOf="@+id/button_disconnect"
         android:text="Connect" />
 
     <Button
-        android:id="@+id/disconnect"
+        android:id="@+id/button_disconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/connect"
-        android:layout_alignBottom="@+id/connect"
-        android:layout_alignLeft="@+id/textView1"
+        android:layout_alignBaseline="@+id/button_connect"
+        android:layout_alignBottom="@+id/button_connect"
+        android:layout_alignLeft="@+id/textView_main_middleMark"
         android:layout_alignParentRight="true"
         android:text="Disconnect" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@id/textView_main_middleMark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
     <Button
-        android:id="@+id/control"
+        android:id="@+id/button_control"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-       
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/connect"
+        android:layout_below="@+id/button_connect"
         android:text="Mission Control" />
 
     <Button
-        android:id="@+id/about"
+        android:id="@+id/button_about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/control"
+        android:layout_below="@+id/button_control"
         android:text="About" />
 
-    <ImageView
-        android:id="@+id/image_bluetooth"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignLeft="@+id/disconnect"
-        android:layout_alignTop="@+id/xImage"
-        android:src="@drawable/bluetooth_dead" />
-
-    <ImageView
-        android:id="@+id/xImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="50dp"
-        android:layout_toLeftOf="@+id/disconnect"
-        android:src="@drawable/ic_launcher" />
-
-    <Button
-        android:id="@+id/scan"
+    <TextView
+        android:id="@+id/textView_version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/about"
+        android:layout_alignParentRight="true"
+        android:text="NXT Universe V 0.0" />
+
+    <Button
+        android:id="@+id/button_scanDevice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textView_version"
+        android:layout_alignRight="@+id/textView_version"
+        android:layout_toRightOf="@+id/imageView_bluetooth"
         android:text="Other Device" />
+
+    <ImageView
+        android:id="@+id/imageView_bluetooth"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignBottom="@+id/button_scanDevice"
+        android:layout_alignLeft="@+id/button_about"
+        android:src="@drawable/bluetooth_dead" />
+
+    <ImageView
+        android:id="@+id/imageView_xImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@id/textView_main_middleMark"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/ic_launcher" />
 
 </RelativeLayout>

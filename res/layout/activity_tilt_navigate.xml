@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ImageView
+            android:id="@+id/tilt2navigate_imageView_xImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/tilt2navigate_textView_leftMotorPower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tilt2navigate_textView_rightMotorPower"
+            android:layout_alignBottom="@+id/tilt2navigate_textView_rightMotorPower"
+            android:layout_toLeftOf="@+id/tilt2navigate_imageView_xImage"
+            android:text="L"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/tilt2navigate_textView_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tilt2navigate_imageView_xImage"
+            android:layout_centerHorizontal="true"
+            android:text="Tap the X to start"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/tilt2navigate_textView_rightMotorPower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/tilt2navigate_imageView_xImage"
+            android:text="R"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/tilt2navigate_textView_middleMark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:id="@+id/tilt2navigate_button_setZero"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tilt2navigate_imageView_xImage"
+            android:layout_toRightOf="@+id/tilt2navigate_textView_middleMark"
+            android:text="Set Zero"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/tilt2navigate_button_setMax"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tilt2navigate_button_setZero"
+            android:layout_alignBottom="@+id/tilt2navigate_button_setZero"
+            android:layout_toLeftOf="@+id/tilt2navigate_textView_middleMark"
+            android:text="Set Max"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+</LinearLayout>

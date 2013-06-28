@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/navigate_textView_pid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="Pid"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+            android:id="@+id/navigate_editText_pidValueInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/navigate_textView_pid"
+            android:layout_centerHorizontal="true"
+            android:ems="10"
+            android:inputType="phone"
+            android:gravity="center" >
+        </EditText>
+
+        <Button
+            android:id="@+id/navigate_button_distancePid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/textView_navigate_middleMark"
+            android:layout_below="@+id/navigate_editText_pidValueInput"
+            android:text="Distance PID" />
+
+        <TextView
+            android:id="@+id/textView_navigate_middleMark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="" />
+
+        <Button
+            android:id="@+id/navigate_button_speedPid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView_navigate_middleMark"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/navigate_editText_pidValueInput"
+            android:text="Speed PID" />
+
+        <Button
+            android:id="@+id/navigate_button_forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/navigate_seekBar_power"
+            android:layout_centerHorizontal="true"
+            android:text="F" />
+
+        <Button
+            android:id="@+id/navigate_button_backward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/navigate_button_forward"
+            android:layout_centerHorizontal="true"
+            android:text="B" />
+
+        <Button
+            android:id="@+id/navigate_button_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/navigate_button_backward"
+            android:layout_alignBottom="@+id/navigate_button_backward"
+            android:layout_toLeftOf="@+id/navigate_button_backward"
+            android:text="L" />
+
+        <Button
+            android:id="@+id/navigate_button_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/navigate_button_backward"
+            android:layout_alignBottom="@+id/navigate_button_backward"
+            android:layout_toRightOf="@+id/navigate_button_backward"
+            android:text="R" />
+
+        <SeekBar
+            android:id="@+id/navigate_seekBar_power"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rotation="-90"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/navigate_textView_power" />
+
+        <TextView
+            android:id="@+id/navigate_textView_power"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Power Navigate"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ProgressBar
+            android:id="@+id/navigate_progressBar_pidRunning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/navigate_editText_pidValueInput"
+            android:layout_below="@+id/navigate_textView_pid"
+            android:layout_toRightOf="@+id/navigate_editText_pidValueInput" />
+
+        <Button
+            android:id="@+id/navigate_button_kill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/navigate_button_distancePid"
+            android:text="Terminate PID" />
+
+    </RelativeLayout>
+
+</LinearLayout>

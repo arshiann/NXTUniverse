@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:weightSum="10">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_weight="1">    
+<SeekBar
+    android:id="@+id/seekBar1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true"/>
+    
+</LinearLayout>
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_weight="8"
+>
+<RelativeLayout
+    android:id="@+id/rlButtons"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+    
+    <Button
+        android:id="@+id/bBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:rotation="90"
+        android:text="B" />
+    
+    <Button
+        android:id="@+id/bForward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bRight"
+        android:layout_toRightOf="@+id/bBack"
+        android:rotation="90"
+        android:text="F" />
+
+    <Button
+        android:id="@+id/bLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bBack"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="30dp"
+        android:rotation="90"
+        android:text="L" />
+
+    <Button
+        android:id="@+id/bRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bBack"
+        android:layout_marginTop="30dp"
+        android:layout_toLeftOf="@+id/bForward"
+        android:rotation="90"
+        android:text="R" />
+
+    </RelativeLayout>
+
+	<RelativeLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="match_parent"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginLeft="44dp"
+	    android:layout_toRightOf="@+id/rlButtons" >
+
+		<ImageView
+		    android:id="@+id/imageView1"
+		    android:layout_width="100dp"
+		    android:layout_height="100dp"
+		    android:layout_centerHorizontal="true"
+		    android:layout_centerVertical="true"
+		    android:rotation="90"
+		    android:src="@drawable/ic_launcher" />
+
+	</RelativeLayout>
+
+</RelativeLayout>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_weight="1">    
+<SeekBar
+    android:id="@+id/seekBar2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentBottom="true"/>
+    
+</LinearLayout>
+</LinearLayout>
