@@ -8,6 +8,7 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
 public class Robot {
 
@@ -17,12 +18,16 @@ public class Robot {
 	private OutputStream outStream;
 	private InputStream inStream;
 
-	// NXT ports
-
+	// NXT ports - Default values unless overwritten via setters
 	private String macAddress;
-	private final byte rightMotorPort = 0x00;
-	private final byte leftMotorPort = 0x01;
-	private byte ultrasonicSensorPort;
+	// private byte otherMotorPort = 0x00;
+	private byte rightMotorPort = 0x01;
+	private byte leftMotorPort = 0x02;
+
+	/**
+	 * Mounting the Ultrasonic sensor on other ports causes the app to crush
+	 */
+	private final byte ultrasonicSensorPort = NXTValue.SENSOR_PORT_4;
 
 	private byte[] motorData = {
 			// Right motor
@@ -33,7 +38,7 @@ public class Robot {
 			rightMotorPort, // Port
 			(byte) 0, // Power
 			0x07, // Mode byte (unknown value)
-			0x00,// NXTValue.MOTOR_REGULATION_SYNC, // Motor regulation
+			NXTValue.MOTOR_REGULATION_SYNC, // Motor regulation
 			(byte) 0, // Turn ratio
 			NXTValue.MOTOR_RUNSTATE_RUNNING, // Run state
 			0x00, // Tacho limit
@@ -49,7 +54,7 @@ public class Robot {
 			leftMotorPort, // Port
 			(byte) 0, // Power
 			0x07, // Mode byte (unknown value)
-			0x00, // NXTValue.MOTOR_REGULATION_SYNC, // Motor regulation
+			NXTValue.MOTOR_REGULATION_SYNC, // Motor regulation
 			(byte) 0, // Turn ratio
 			NXTValue.MOTOR_RUNSTATE_RUNNING, // Run state
 			0x00, // Tacho limit
@@ -58,48 +63,42 @@ public class Robot {
 			0x00 // Tacho limit
 	};
 
-	public void setMotorData(byte[] motorData) {
-		this.motorData = motorData;
-	}
-
-	public byte[] getMotorData() {
-		return motorData;
-	}
-
-	public void setMacAddress(String macAddress) {
-		this.macAddress = macAddress;
-	}
-
-	// public void setRightMotorPort(byte port) {
-	// rightMotorPort = port;
-	// }
-	//
-	// public void setLeftMotorPort(byte port) {
-	// this.leftMotorPort = port;
-	// }
-
-	public void setUltrasonicSensorPort(byte port) {
-		this.ultrasonicSensorPort = port;
-	}
-
 	public byte getRightMotorPort() {
 		return rightMotorPort;
+	}
+
+	public void setRightMotorPort(byte rightMotorPort) {
+		this.rightMotorPort = rightMotorPort;
+		this.motorData[4] = rightMotorPort;
 	}
 
 	public byte getLeftMotorPort() {
 		return leftMotorPort;
 	}
 
+	public void setLeftMotorPort(byte leftMotorPort) {
+		this.leftMotorPort = leftMotorPort;
+		this.motorData[18] = leftMotorPort;
+	}
+
 	public byte getUltrasonicSensorPort() {
 		return ultrasonicSensorPort;
 	}
 
-	public OutputStream getOutStream() {
-		return outStream;
+	public String getMacAddress() {
+		return macAddress;
 	}
 
-	public InputStream getInStream() {
-		return inStream;
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
+	}
+
+	public byte[] getMotorData() {
+		return motorData;
+	}
+
+	public void setMotorData(byte[] motorData) {
+		this.motorData = motorData;
 	}
 
 	/**
@@ -116,29 +115,30 @@ public class Robot {
 					.fromString("00001101-0000-1000-8000-00805F9B34FB"));
 			socket.connect();
 
-			// Note the preference after removing MainActivity
+			// Getting inStream and outStream
 			outStream = socket.getOutputStream();
 			inStream = socket.getInputStream();
+			Log.i("Connection", "Sucessfully connected to NXT!");
 
-			// Play the confirmation tone on the NXT device
-			byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03, 0x0B,
-					0x02, (byte) 0xFA, 0x00 };
-			outStream.write(confirmationTone);
+			// Setting up sensors - Ultrasonic sensor
+			// Declaring port and sensor type
+			byte[] setInputMode = { 0x05, 0x00, NXTValue.RETURN_VOID,
+					NXTValue.SET_INPUT_MODE, ultrasonicSensorPort,
+					NXTValue.SENSOR_TYPE_LOW_SPEED_9V, NXTValue.SENSOR_MODE_RAW };
+			write(setInputMode);
+			Log.i("Connection", "Port setup successful");
 
-			// Setting up sensors
-			try {
-				// Ultrasonic sensor
-				byte[] ultrasonicSetupCommand = { 0x05, 0x00,
-						NXTValue.RETURN_VOID, NXTValue.SET_INPUT_MODE,
-						ultrasonicSensorPort,
-						NXTValue.SENSOR_TYPE_LOW_SPEED_9V,
-						NXTValue.SENSOR_MODE_RAW };
-				write(ultrasonicSetupCommand);
-				write(NXTValue.SET_CONTINUOUS);
-			} catch (Exception e) {
-				e.printStackTrace();
-				// display5.setText("Setup error"); // XXX
-			}
+			// Setting Ultrasonic sensor (on i2c bus) on continuous measurement
+			int[] read1;
+			do {
+				byte[] setContinuous = { 0x08, 0x00, (byte) 0x00, 0x0F, 0x03,
+						0x03, 0x00, 0x02, 0x41, 0x02 };
+				write(setContinuous);
+				read1 = read();
+				Log.i("read1", Activity_Control.intArrayToString(read1));
+			} while (read1[4] != 0);
+			Log.i("Connection", "SetContinuous successful");
+
 			// End of sensors setup
 			connected = true;
 		} catch (IOException e) {
@@ -170,44 +170,49 @@ public class Robot {
 	 * @return int - Distance in cm
 	 */
 	public int getUltrasonicSensorValue() {
-		// Data and scope
-		byte[] askStatusOnPort3 = { 0x03, 0x00, 0x00, 0x0E, 0x03 };
-		byte[] readByteZero = { 0x07, 0x00, 0x00, 0x0F, 0x03, 0x02, 0x01, 0x02,
-				0x42 };
-		final byte[] readLS = { 0x03, 0x00, 0x00, 0x10, 0x03 };
-
-		@SuppressWarnings("unused")
-		int[] input1;
-		int[] input2;
-		int[] input3;
-
-		// Read write
+		int[] read1 = new int[1];
 		try {
-			write(readByteZero);
-			Thread.sleep(100);
+			// Read byte zero
+			Log.i("UlSonic", "Reading byte zero");
 
-			// Clearing NXT buffer for further reading
-			input1 = read();
-
-			// Wait until there is something to read
 			do {
-				write(askStatusOnPort3);
-				input2 = read();
-			} while (input2[5] == 0);
+				byte[] readByteZero = { 0x07, 0x00, 0x00, 0x0F, 0x03, 0x02,
+						0x01, 0x02, 0x42 };
+				write(readByteZero);
+				read1 = read();
+				Log.i("read1", Activity_Control.intArrayToString(read1));
+			} while (read1[4] != 0);
+			Log.i("UlSonic", "Byte zero is read successfully");
 
-			// Request NXT to reply with ultrasonic sensor's data
+			// Polling port 4 (0x03)
+			Log.i("UlSonic", "Polling port 4 (0x03)");
+			int[] read2;
+			do {
+				byte[] askStatusOnPort4 = { 0x03, 0x00, 0x00, 0x0E, 0x03 };
+				write(askStatusOnPort4);
+				read2 = read();
+				Log.i("read2", Activity_Control.intArrayToString(read2));
+			} while (read2[5] != 1);
+			Log.i("UlSonic", "Polling port 4 (0x03) success");
+
+			// Reading data
+			Log.i("UlSonic", "Read UlSonic data");
+			final byte[] readLS = { 0x03, 0x00, 0x00, 0x10, 0x03 };
 			write(readLS);
-
-			// Reading data form NXT
-			input3 = read();
-
-			// Return the distance (cm)
-			return input3[6];
+			int[] read3 = read();
+			Log.i("read3", Activity_Control.intArrayToString(read3));
+			if (read3[6] == 255) {
+				Log.i("UlSonic", "Physical object is out of UlSonic's range");
+			}
+			Log.i("UlSonic", "UlSonic data reading successful");
+			return read3[6];
 		} catch (Exception e) {
-			e.printStackTrace();
-			// In case of an error, return 255
+			if (read1[0] == 255) {
+				Log.i("UlSonic", "Lost connection");
+			}
 			return 255;
 		}
+
 	}
 
 	/**
@@ -228,18 +233,18 @@ public class Robot {
 		}
 
 		// Updating data based on what user wants
-		if (direction == NXTValue.GO_FORWARD) {
+		if (direction == NXTValue.DIRECTION_FORWARD) {
 			motorData[5] = (byte) power;
 			motorData[19] = (byte) power;
-		} else if (direction == NXTValue.GO_BACKWARD) {
+		} else if (direction == NXTValue.DIRECTION_BACKWARD) {
 			motorData[5] = (byte) -power;
 			motorData[19] = (byte) -power;
-		} else if (direction == NXTValue.TURN_RIGHT) {
+		} else if (direction == NXTValue.DIRECTION_RIGHT) {
 			motorData[5] = (byte) -power;
 			motorData[7] = 0x00;
 			motorData[19] = (byte) power;
 			motorData[21] = 0x00;
-		} else if (direction == NXTValue.TURN_LEFT) {
+		} else if (direction == NXTValue.DIRECTION_LEFT) {
 			motorData[5] = (byte) power;
 			motorData[7] = 0x00;
 			motorData[19] = (byte) -power;
@@ -254,12 +259,11 @@ public class Robot {
 	}
 
 	/**
-	 * Returns a byte array with the right motor's position at index 0 and the
-	 * left motor's position at index 1.
+	 * Returns a byte array with motor's rotation (degree)
 	 * 
-	 * @return Byte array [right motor's position, left motor's position]
+	 * @return Byte array [right, left]
 	 */
-	public int[] getMotorPosition() {
+	public int[] getMotorRotation() {
 		byte[] rightMotorCommand = { 0x03, 0x00, NXTValue.RETURN_STATUS, 0x06,
 				rightMotorPort };
 		byte[] leftMotorCommand = { 0x03, 0x00, NXTValue.RETURN_STATUS, 0x06,

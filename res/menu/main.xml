@@ -8,6 +8,10 @@
         android:id="@+id/menu_main_tilt_navigate"
         android:title="Tilt to Navigate"/>
     
+    <item
+        android:id="@+id/menu_main_about"
+        android:title="About"/>
+    
 <!--     <item -->
 <!--         android:id="@+id/action_settings" -->
 <!--         android:orderInCategory="100" -->

@@ -37,7 +37,7 @@ public class Activity_TiltToNavigate extends Activity implements
 	private boolean activityStarted = false;
 	private boolean robotStopped = false;
 
-	private Robot robot1 = Activity_Main.robot1;
+	private Robot robot1 = Activity_Main.robot[0];
 	private byte[] motorData = robot1.getMotorData();
 
 	private SensorManager sensorManager;

@@ -1,0 +1,27 @@
+1. Connect and play beep on NXT
+	try {
+		// Establishing connection with the NXT device
+		socket = nxt.createRfcommSocketToServiceRecord(UUID
+				.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+		socket.connect();
+	
+		// Note the preference after removing MainActivity
+		outStream = socket.getOutputStream();
+		inStream = socket.getInputStream();
+	
+		// Play the confirmation tone on the NXT device
+		byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03,
+				0x0B, 0x02, (byte) 0xFA, 0x00 };
+		outStream.write(confirmationTone);
+		success = true;
+	} catch (IOException e) {
+		e.printStackTrace();
+		success = false;
+	}
+	
+	if (success) {
+		xImage.setImageResource(R.drawable.connection_connected);
+	} else {
+		xImage.setImageResource(R.drawable.connection_disconnected);
+	}
+

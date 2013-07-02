@@ -130,11 +130,11 @@ public class NXTValue {
 
 	// Extra
 	// Motor direction
-	public static final int STOP = 0;
-	public static final int GO_FORWARD = 1;
-	public static final int GO_BACKWARD = 2;
-	public static final int TURN_RIGHT = 3;
-	public static final int TURN_LEFT = 4;
+	public static final int DIRECTION_STOP = 0;
+	public static final int DIRECTION_FORWARD = 1;
+	public static final int DIRECTION_BACKWARD = 2;
+	public static final int DIRECTION_RIGHT = 3;
+	public static final int DIRECTION_LEFT = 4;
 
 	public static final int PID_MODE_DISTANCE = 1;
 	public static final int PID_MODE_SPEED = 2;
@@ -148,8 +148,7 @@ public class NXTValue {
 
 	// byte[] setPortMode = { 0x05, 0x00, (byte) 0x80, 0x05, 0x03, 0x0B, 0x00 };
 
-	public static final byte[] SET_CONTINUOUS = { 0x08, 0x00, (byte) 0x80,
-			0x0F, 0x03, 0x03, 0x00, 0x02, 0x41, 0x02 };
+	
 
 	// public static final byte[] ASK_STATUS_ON_PORT_4 = { 0x03, 0x00, 0x00,
 	// 0x0E,

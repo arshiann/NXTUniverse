@@ -1,6 +1,28 @@
+// Version Log
+// 1 - Connecting Bluetooth and making the beep tone
+// 2 - First MainActivity and Control
+// 3 - Getting data from ultrasonic sensor
+// 4 - Functioning Motor and its data structure
+// 5 - Image enabling Bluetooth
+// 6 - Ultrasonic sensor's method
+// 7 - Motor position
+// 8 - Motor position's method
+// 9 - Reset motor's position and its method
+// 10 - NXTValue class
+// 11 - Distance PID
+// 12 - Speed PID
+// 13 - Combined PID
+// 14 - Improved NXTValue class
+// 15 - New look for MainActivity
+// 16 - Navigating activity
+// 17 - Robot class
+// 18 - Tilt to navigate activity
+// 19 - Communication and robot class bugs fix
+
 package ctech.nxtuniverse;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,66 +32,76 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 public class Activity_Main extends Activity {
 
-	public static String version = "NXT Universe V 0.18 - Alpha";
-	/*
-	 * 1 - connection and beep 2 - first main activity screen 3 - ultrasonic
-	 * sensor 4 - motor 5 - img bluetooth button 6 - getUltrasonicSensor() 7 -
-	 * left shift motor position 8 - getMotorPosition() 9 - resetMotorPosition()
-	 * 10 - NXTValue 11 - Dist pid 12 - Speed pid 13 - combined pid 14 - New
-	 * NXTValue 15 - new main activity screen 16 - Navigate activity 17 - Robot
-	 * class 18 - Tilt to navigate
-	 */
+	public static final String VERSION = "NXT Universe V 0.19 Alpha";
 
-	protected BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-	protected ImageView xImage, bluetooth;
-	protected Button connect, disconnect, control, about;
-	protected TextView versionDisplay;
+	private BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+	private ImageView xImage, bluetooth;
+	private Button connect, disconnect;
+	private TextView versionDisplay;
 
-	public static Robot robot1, robot2;
+	private SharedPreferences pref;
+	private SharedPreferences.Editor prefEdit;
+
+	public static Robot[] robot = new Robot[1];
 
 	// Robot 1 - "00:16:53:12:AA:37"
 	// Robot 2 - "00:12:53:12:AA:D5"
-
-	// /**
-	// *
-	// * @param num - Number of the robot
-	// * @return - Returns the robot object. Returns Null if no robot of that
-	// number is found.
-	// */
-	// public static Robot getRobot(int num) {
-	// if (num == 1) {
-	// return robot1;
-	// } else if (num == 2) {
-	// return robot2;
-	// } else {
-	// return null;
-	// }
-	// }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		robot1 = new Robot();
+		// Version run tracking
+		pref = this.getSharedPreferences("Preferences", Context.MODE_PRIVATE);
+		prefEdit = pref.edit();
+		String storedVersion = pref.getString("Version", "");
+		String currentVersion = VERSION;
+		int currentRun = 1;
+		if (storedVersion.equals(currentVersion)) {
+			currentRun = pref.getInt("Run", -1) + 1;
+			Log.i("Run", currentRun + "");
+			prefEdit.putInt("Run", currentRun);
+		} else {
+			prefEdit.putString("Version", VERSION);
+			prefEdit.putInt("Run", 1);
+		}
+		prefEdit.commit();
 
-		// Images
-		xImage = (ImageView) findViewById(R.id.imageView_xImage);
-		bluetooth = (ImageView) findViewById(R.id.imageView_bluetooth);
-
-		// Buttons
-		connect = (Button) findViewById(R.id.button_connect);
-		disconnect = (Button) findViewById(R.id.button_disconnect);
-		control = (Button) findViewById(R.id.button_control);
-		about = (Button) findViewById(R.id.button_about);
-
-		// TextView
+		// Version display TextView
 		versionDisplay = (TextView) findViewById(R.id.textView_version);
-		versionDisplay.setText(version);
+		versionDisplay.setText(VERSION + " Run: " + currentRun);
+
+		// Initializing robots
+		for (int i = 0; i < robot.length; i++) {
+			robot[i] = new Robot();
+		}
+
+		// xImage
+		xImage = (ImageView) findViewById(R.id.imageView_xImage);
+		xImage.setOnClickListener(new View.OnClickListener() {
+
+			int counter = 0;
+
+			@Override
+			public void onClick(View v) {
+				counter++;
+				if (counter == 3) {
+					Intent startControl = new Intent("nxtuniverse.CONTROL");
+					startActivity(startControl);
+					counter = 0;
+				}
+			}
+		});
+
+		// Bluetooth image
+		bluetooth = (ImageView) findViewById(R.id.imageView_bluetooth);
 
 		// Sets alive/dead Bluetooth logo
 		if (adapter.isEnabled()) { // If Bluetooth is on, set alive logo
@@ -78,7 +110,6 @@ public class Activity_Main extends Activity {
 			bluetooth.setImageResource(R.drawable.bluetooth_dead);
 		}
 
-		// Assigning task to buttons
 		bluetooth.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -107,103 +138,45 @@ public class Activity_Main extends Activity {
 			}
 		});
 
+		// Buttons
+		connect = (Button) findViewById(R.id.button_connect);
+		disconnect = (Button) findViewById(R.id.button_disconnect);
+
 		connect.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+				robot[0] = new Robot();
 
-				// XXX sync and unsync
-				// XXX getters and setters
-				// XXX 2 sideways seek bars in navigate one for speed and one
-				// for dist.
-
-				robot1 = new Robot();
-
-				// robot1.setRightMotorPort(NXTValue.MOTOR_PORT_B);
-				// robot1.setLeftMotorPort(NXTValue.MOTOR_PORT_A);
-				robot1.setUltrasonicSensorPort(NXTValue.SENSOR_PORT_4);
-				robot1.setMacAddress("00:16:53:12:AA:37");
+				robot[0].setMacAddress("00:16:53:12:AA:37");
+				robot[0].setRightMotorPort(NXTValue.MOTOR_PORT_B);
+				robot[0].setLeftMotorPort(NXTValue.MOTOR_PORT_C);
 				// robot1.setMacAddress("00:12:53:12:AA:D5");
 
-				boolean connected = robot1.connect();
+				boolean connected = robot[0].connect();
 				if (connected) {
 					xImage.setImageResource(R.drawable.connection_connected);
+					robot[0].write(NXTValue.CONFIRMATION_TONE);
 				} else {
 					xImage.setImageResource(R.drawable.connection_disconnected);
 				}
-
-				robot1.write(NXTValue.CONFIRMATION_TONE);
-
-				// robot2.outStream.write(confirmationTone);
-
-				// boolean success;
-				// BluetoothDevice nxt = adapter.getRemoteDevice(nxtMacAddress);
-				// try {
-				// // Establishing connection with the NXT device
-				// socket = nxt.createRfcommSocketToServiceRecord(UUID
-				// .fromString("00001101-0000-1000-8000-00805F9B34FB"));
-				// socket.connect();
-				//
-				// // Note the preference after removing MainActivity
-				// outStream = socket.getOutputStream();
-				// inStream = socket.getInputStream();
-				//
-				// // Play the confirmation tone on the NXT device
-				// byte[] confirmationTone = { 0x06, 0x00, (byte) 0x80, 0x03,
-				// 0x0B, 0x02, (byte) 0xFA, 0x00 };
-				// outStream.write(confirmationTone);
-				// success = true;
-				// } catch (IOException e) {
-				// e.printStackTrace();
-				// success = false;
-				// }
-				//
-				// if (success) {
-				// xImage.setImageResource(R.drawable.connection_connected);
-				// } else {
-				// xImage.setImageResource(R.drawable.connection_disconnected);
-				// }
 			}
 		});
 
-		// disconnect.setOnClickListener(new View.OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// boolean success;
-		// try {
-		// socket.close();
-		// success = true;
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// success = false;
-		// }
-		//
-		// if (success) {
-		// xImage.setImageResource(R.drawable.connection_disconnected);
-		// } else {
-		// xImage.setImageResource(R.drawable.connection_connected);
-		// }
-		// }
-		// });
-
-		control.setOnClickListener(new View.OnClickListener() {
+		disconnect.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Intent startControl = new Intent("nxtuniverse.CONTROL");
-				startActivity(startControl);
+				boolean success = robot[0].disconnect();
+
+				if (success) {
+					xImage.setImageResource(R.drawable.connection_disconnected);
+				} else {
+					xImage.setImageResource(R.drawable.connection_connected);
+				}
 			}
 		});
 
-		about.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent startAbout = new Intent("nxtuniverse.ABOUT");
-				startActivity(startAbout);
-			}
-		});
 	}
 
 	@Override
@@ -222,6 +195,9 @@ public class Activity_Main extends Activity {
 		} else if (item.getItemId() == R.id.menu_main_tilt_navigate) {
 			Intent startTiltNavigate = new Intent("nxtuniverse.TILT_NAVIGATE");
 			startActivity(startTiltNavigate);
+		} else if (item.getItemId() == R.id.menu_main_about) {
+			Intent startAbout = new Intent("nxtuniverse.ABOUT");
+			startActivity(startAbout);
 		}
 		return true;
 	}
@@ -229,8 +205,9 @@ public class Activity_Main extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		robot1.disconnect();
-		robot2.disconnect();
+		for (int i = 0; i < robot.length; i++) {
+			robot[i].disconnect();
+		}
 		finish();
 	}
 }

@@ -92,7 +92,6 @@
             android:id="@+id/navigate_seekBar_power"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:rotation="-90"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/navigate_textView_power" />
 
@@ -104,14 +103,6 @@
             android:layout_centerVertical="true"
             android:text="Power Navigate"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <ProgressBar
-            android:id="@+id/navigate_progressBar_pidRunning"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/navigate_editText_pidValueInput"
-            android:layout_below="@+id/navigate_textView_pid"
-            android:layout_toRightOf="@+id/navigate_editText_pidValueInput" />
 
         <Button
             android:id="@+id/navigate_button_kill"

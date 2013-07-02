@@ -8,50 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Activity_Main" >
 
-    <Button
-        android:id="@+id/button_connect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/imageView_xImage"
-        android:layout_toLeftOf="@+id/button_disconnect"
-        android:text="Connect" />
-
-    <Button
-        android:id="@+id/button_disconnect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_connect"
-        android:layout_alignBottom="@+id/button_connect"
-        android:layout_alignLeft="@+id/textView_main_middleMark"
-        android:layout_alignParentRight="true"
-        android:text="Disconnect" />
-
-    <TextView
-        android:id="@id/textView_main_middleMark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <Button
-        android:id="@+id/button_control"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/button_connect"
-        android:text="Mission Control" />
-
-    <Button
-        android:id="@+id/button_about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/button_control"
-        android:text="About" />
 
     <TextView
         android:id="@+id/textView_version"
@@ -75,16 +31,42 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignBottom="@+id/button_scanDevice"
-        android:layout_alignLeft="@+id/button_about"
         android:src="@drawable/bluetooth_dead" />
+
+    <TextView
+        android:id="@+id/textView_main_middleMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/button_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/textView_main_middleMark"
+        android:layout_centerVertical="true"
+        android:text="Connect" />
+
+    <Button
+        android:id="@+id/button_disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_connect"
+        android:layout_alignBottom="@+id/button_connect"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/button_connect"
+        android:text="Disconnect" />
 
     <ImageView
         android:id="@+id/imageView_xImage"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_below="@id/textView_main_middleMark"
+        android:layout_above="@+id/button_connect"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
         android:src="@drawable/ic_launcher" />
 
 </RelativeLayout>

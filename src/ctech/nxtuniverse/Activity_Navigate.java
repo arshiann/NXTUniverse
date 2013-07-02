@@ -7,32 +7,32 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class Activity_Navigate extends Activity {
 
 	private EditText pidValueInput;
-	private Button forward, backward, left, right, speedPid, distancePid,
-			killPid;
-	private SeekBar power;
-	private ProgressBar pidRunning;
-	private Robot robot1 = Activity_Main.robot1;
+	private Button forward, backward, left, right;
+	private Button speedPid, distancePid, killPid;
+	private SeekBar powerBar;
+	private Robot robot1;
+
+	private int power;
 
 	private PID pid;
-
-	// private byte[] robot1MotorData = robot1.getMotorData();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_navigate);
 
+		// Setting the robot
+		robot1 = Activity_Main.robot[0];
+
 		pidValueInput = (EditText) findViewById(R.id.navigate_editText_pidValueInput);
 
-		pidRunning = (ProgressBar) findViewById(R.id.navigate_progressBar_pidRunning);
-		pidRunning.setVisibility(View.GONE);
-
+		// Buttons
 		forward = (Button) findViewById(R.id.navigate_button_forward);
 		backward = (Button) findViewById(R.id.navigate_button_backward);
 		left = (Button) findViewById(R.id.navigate_button_left);
@@ -41,8 +41,29 @@ public class Activity_Navigate extends Activity {
 		distancePid = (Button) findViewById(R.id.navigate_button_distancePid);
 		killPid = (Button) findViewById(R.id.navigate_button_kill);
 
-		power = (SeekBar) findViewById(R.id.navigate_seekBar_power);
-		power.setProgress(50);
+		// Seek bar
+		powerBar = (SeekBar) findViewById(R.id.navigate_seekBar_power);
+		powerBar.setProgress(75);
+		power = powerBar.getProgress();
+
+		powerBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				power = powerBar.getProgress();
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+
+			}
+		});
 
 		forward.setOnTouchListener(new View.OnTouchListener() {
 
@@ -50,11 +71,10 @@ public class Activity_Navigate extends Activity {
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
 
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.GO_FORWARD, power.getProgress());
-					Log.i("power", power.getProgress() + "");
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.STOP, 0);
+				if (action == MotionEvent.ACTION_DOWN) {
+					robot1.move(NXTValue.DIRECTION_FORWARD, power);
+				} else if (action == MotionEvent.ACTION_UP) {
+					robot1.move(NXTValue.DIRECTION_STOP, 0);
 				}
 				return true;
 			}
@@ -65,10 +85,10 @@ public class Activity_Navigate extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.GO_BACKWARD, power.getProgress());
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.STOP, 0);
+				if (action == MotionEvent.ACTION_DOWN) {
+					robot1.move(NXTValue.DIRECTION_BACKWARD, power);
+				} else if (action == MotionEvent.ACTION_UP) {
+					robot1.move(NXTValue.DIRECTION_STOP, 0);
 				}
 				return true;
 			}
@@ -79,10 +99,10 @@ public class Activity_Navigate extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.TURN_RIGHT, power.getProgress());
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.STOP, 0);
+				if (action == MotionEvent.ACTION_DOWN) {
+					robot1.move(NXTValue.DIRECTION_RIGHT, power);
+				} else if (action == MotionEvent.ACTION_UP) {
+					robot1.move(NXTValue.DIRECTION_STOP, 0);
 				}
 				return true;
 			}
@@ -93,10 +113,10 @@ public class Activity_Navigate extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.TURN_LEFT, power.getProgress());
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.STOP, 0);
+				if (action == MotionEvent.ACTION_DOWN) {
+					robot1.move(NXTValue.DIRECTION_LEFT, power);
+				} else if (action == MotionEvent.ACTION_UP) {
+					robot1.move(NXTValue.DIRECTION_STOP, 0);
 				}
 				return true;
 			}
@@ -110,16 +130,17 @@ public class Activity_Navigate extends Activity {
 				if (pidValueInput.length() != 0) {
 					pidValue = Integer.parseInt(pidValueInput.getText()
 							.toString());
-					
+
 					if (pid == null) {
-						pid = new PID(robot1, NXTValue.PID_MODE_DISTANCE, pidValue);
+						pid = new PID(robot1, NXTValue.PID_MODE_DISTANCE,
+								pidValue);
 						pid.start();
 					} else {
 						pid.kill();
-						pid = new PID(robot1, NXTValue.PID_MODE_DISTANCE, pidValue);
+						pid = new PID(robot1, NXTValue.PID_MODE_DISTANCE,
+								pidValue);
 						pid.start();
 					}
-					pidRunning.setVisibility(View.VISIBLE);
 				} else {
 					Log.i("pid value input", "nothing was entered");// XXX
 				}
@@ -143,7 +164,6 @@ public class Activity_Navigate extends Activity {
 						pid = new PID(robot1, NXTValue.PID_MODE_SPEED, pidValue);
 						pid.start();
 					}
-					pidRunning.setVisibility(View.VISIBLE);
 				} else {
 					Log.i("pid value input", "nothing was entered");// XXX
 				}
@@ -154,13 +174,28 @@ public class Activity_Navigate extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (pid != null) {
-					pid.kill();
-				}
-				pidRunning.setVisibility(View.GONE);
+				killPidThread();
 			}
 		});
 
+	}
+
+	private void killPidThread() {
+		if (pid != null) {
+			pid.kill();
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		// Stop the thread
+		killPidThread();
+		
+		// Stop the robot in case if the robot is still moving
+		robot1.move(NXTValue.DIRECTION_STOP, 0);
+		
+		finish();
 	}
 
 }

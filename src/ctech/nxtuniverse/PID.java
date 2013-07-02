@@ -173,7 +173,7 @@ public class PID extends Thread {
 				startTime = System.currentTimeMillis();
 
 				// Get value form NXT
-				int[] tempMotorRotationCount = robot1.getMotorPosition();
+				int[] tempMotorRotationCount = robot1.getMotorRotation();
 
 				// Setting right motor value
 				motorRotationCount = tempMotorRotationCount[0];
