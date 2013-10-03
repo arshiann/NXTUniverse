@@ -81,7 +81,7 @@ public class Activity_Main extends Activity {
 
 	protected static BluetoothAdapter btAdapter = BluetoothAdapter
 			.getDefaultAdapter();
-	private static boolean turnedBtOn;
+	private static boolean turnedBtOn = false;
 
 	private SharedPreferences pref;
 	private SharedPreferences.Editor prefEdit;
@@ -255,16 +255,23 @@ public class Activity_Main extends Activity {
 		} else if (item.getItemId() == R.id.menu_main_about) {
 			Intent startAbout = new Intent("nxtuniverse.ABOUT");
 			startActivity(startAbout);
-//		} else if (item.getItemId() == R.id.menu_main_compass) {
-////			Intent startCompass = new Intent("nxtuniverse.COMPASS");
-////			startActivity(startCompass);
+			// } else if (item.getItemId() == R.id.menu_main_compass) {
+			// // Intent startCompass = new Intent("nxtuniverse.COMPASS");
+			// // startActivity(startCompass);
 		} else if (item.getItemId() == R.id.menu_main_joystick) {
-//			Intent startJoystick = new Intent(this, Activity_Joystick.class);
-//			startActivity(startJoystick);
+			// Intent startJoystick = new Intent(this, Activity_Joystick.class);
+			// startActivity(startJoystick);
 			Intent startJoystick = new Intent("nxtuniverse.JOYSTICK");
 			startActivity(startJoystick);
 		}
 		return true;
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		// XXX might disturb the connection if this activity is destroyed
+		
 	}
 
 	@Override
@@ -273,9 +280,12 @@ public class Activity_Main extends Activity {
 		for (int i = 0; i < robot.length; i++) {
 			robot[i].disconnect();
 		}
-		if (turnedBtOn){
+
+		if (turnedBtOn) {
+			turnedBtOn = false;
 			BluetoothAdapter.getDefaultAdapter().disable();
 		}
+		
 		finish();
 	}
 
