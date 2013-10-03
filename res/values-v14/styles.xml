@@ -8,5 +8,9 @@
     <style name="AppBaseTheme" parent="android:Theme.Holo">
         <!-- API 14 theme customizations can go here. -->
     </style>
+    
+    <style name="AppBaseTheme_Light" parent="android:Theme.Holo.Light">
+        <!-- API 14 theme customizations can go here. -->
+    </style>
 
 </resources>

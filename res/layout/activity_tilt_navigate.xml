@@ -71,6 +71,7 @@
             android:layout_toLeftOf="@+id/tilt2navigate_textView_middleMark"
             android:text="Set Max"
             android:visibility="gone" />
+
     </RelativeLayout>
 
 </LinearLayout>

@@ -3,13 +3,21 @@ package ctech.nxtuniverse;
 public class NXTValue {
 
 	// Command return type
+	/**
+	 * NXT device will return status
+	 */
 	public static final byte RETURN_STATUS = (byte) 0x00;
+	/**
+	 * NXT device will not return anything
+	 */
 	public static final byte RETURN_VOID = (byte) 0x80;
 
 	// Operational Codes.
 	// Typically control sensors, cerveux or request information.
-	// public static final byte START_PROGRAM = (byte) 0x00; // Deprecated
-	// public static final byte STOP_PROGRAM = (byte) 0x01; // Deprecated
+	/** @deprecated */
+	public static final byte START_PROGRAM = (byte) 0x00;
+	/** @deprecated */
+	public static final byte STOP_PROGRAM = (byte) 0x01;
 	public static final byte PLAY_SOUND_FILE = (byte) 0x02;
 	public static final byte PLAY_TONE = (byte) 0x03;
 	public static final byte SET_OUTPUT_STATE = (byte) 0x04;
@@ -25,8 +33,8 @@ public class NXTValue {
 	public static final byte LS_GET_STATUS = (byte) 0x0E;
 	public static final byte LS_WRITE = (byte) 0x0F;
 	public static final byte LS_READ = (byte) 0x10;
-	// Deprecated
-	// public static final byte GET_CURRENT_PROGRAM_NAME = (byte) 0x11;
+	/** @deprecated */
+	public static final byte GET_CURRENT_PROGRAM_NAME = (byte) 0x11;
 	public static final byte MESSAGE_READ = (byte) 0x13;
 
 	// //////////////////////////// MOTORS //////////////////////////////
@@ -34,7 +42,8 @@ public class NXTValue {
 	public static final byte MOTOR_PORT_A = (byte) 0x00;
 	public static final byte MOTOR_PORT_B = (byte) 0x01;
 	public static final byte MOTOR_PORT_C = (byte) 0x02;
-	// public static final byte motorAll = (byte) 0xFF; // Deprecated
+	/** @deprecated */
+	public static final byte motorAll = (byte) 0xFF;
 
 	// Modes. To alter how the cerveux utilize motors.
 	public static final byte MOTOR_COAST = (byte) 0x00;
@@ -61,8 +70,8 @@ public class NXTValue {
 	public static final byte SENSOR_PORT_4 = (byte) 0x03;
 
 	// Sensor Types. Specify sensor type and operation.
-	// Deprecated
-	// public static final byte SENSOR_TYPE_NO_SENSOR = (byte) 0x00;
+	/** @deprecated */
+	public static final byte SENSOR_TYPE_NO_SENSOR = (byte) 0x00;
 	public static final byte SENSOR_TYPE_LIMIT_SWITCH = (byte) 0x01;
 	public static final byte SENSOR_TYPE_TEMPERATURE = (byte) 0x02;
 	public static final byte SENSOR_TYPE_ULTRASONIC_SENSOR = (byte) 0x03;
@@ -91,42 +100,42 @@ public class NXTValue {
 
 	// ////////////////////////// RETURNED CODES //////////////////////////////
 	// NXT's Return Values. Success and error codes returned by NXT.
-	public static final byte RETURNED_CODE_SUCCESS = (byte) 0x00;
-	public static final byte RETURNED_CODE_PENDING_COMMUNICATION = (byte) 0x20;
-	public static final byte RETURNED_CODE_MAILBOX_EMPTY = (byte) 0x40;
-	public static final byte RETURNED_CODE_NO_MORE_HANDLES = (byte) 0x81;
-	public static final byte RETURNED_CODE_NO_SPACE = (byte) 0x82;
-	public static final byte RETURNED_CODE_NO_MORE_FILES = (byte) 0x83;
-	public static final byte RETURNED_CODE_END_OF_FILE_EXPECTED = (byte) 0x84;
-	public static final byte RETURNED_CODE_END_OF_FILE = (byte) 0x85;
-	public static final byte RETURNED_CODE_NOT_A_LINEAR_FILE = (byte) 0x86;
-	public static final byte RETURNED_CODE_FILE_NOT_FOUND = (byte) 0x87;
-	public static final byte RETURNED_CODE_HANDLE_ALL_READY_CLOSED = (byte) 0x88;
-	public static final byte RETURNED_CODE_NO_LINEAR_SPACE = (byte) 0x89;
-	public static final byte RETURNED_CODE_UNDEFINED_ERROR = (byte) 0x8A;
-	public static final byte RETURNED_CODE_FILE_IS_BUSY = (byte) 0x8B;
-	public static final byte RETURNED_CODE_NO_WRITE_BUFFERS = (byte) 0x8C;
-	public static final byte RETURNED_CODE_APPEND_NOT_POSSIBLE = (byte) 0x8D;
-	public static final byte RETURNED_CODE_FILE_IS_FULL = (byte) 0x8E;
-	public static final byte RETURNED_CODE_FILE_EXISTS = (byte) 0x8F;
-	public static final byte RETURNED_CODE_MODULE_NOT_FOUND = (byte) 0x90;
-	public static final byte RETURNED_CODE_OUT_OF_BOUNDARY = (byte) 0x91;
-	public static final byte RETURNED_CODE_ILLEGAL_FILE_NAME = (byte) 0x92;
-	public static final byte RETURNED_CODE_ILLEGAL_HANDLE = (byte) 0x93;
-	public static final byte RETURNED_CODE_REQUEST_FAILED = (byte) 0xBD;
-	public static final byte RETURNED_CODE_UNKNOWN_OP_CODE = (byte) 0xBE;
-	public static final byte RETURNED_CODE_INSANE_PACKET = (byte) 0xBF;
-	public static final byte RETURNED_CODE_OUT_OF_RANGE = (byte) 0xC0;
-	public static final byte RETURNED_CODE_BUS_ERROR = (byte) 0xDD;
-	public static final byte RETURNED_CODE_COMMUNICATION_OVERFLOW = (byte) 0xDE;
-	public static final byte RETURNED_CODE_CHANEL_INVALID = (byte) 0xDF;
-	public static final byte RETURNED_CODE_CHANEL_BUSY = (byte) 0xE0;
-	public static final byte RETURNED_CODE_CO_ACTIVE_PROGRAM = (byte) 0xEC;
-	public static final byte RETURNED_CODE_ILLEGAL_SIZE = (byte) 0xED;
-	public static final byte RETURNED_CODE_ILLEGAL_MAILBOX = (byte) 0xEE;
-	public static final byte RETURNED_CODE_INVALID_FIELD = (byte) 0xEF;
-	public static final byte RETURNED_CODE_BAD_INPUT_OUTPUT = (byte) 0xF0;
-	public static final byte RETURNED_CODE_INSUFFICIENT_MEMMORY = (byte) 0xFB;
+	public static final byte RETURNED_SUCCESS = (byte) 0x00;
+	public static final byte RETURNED_PENDING_COMMUNICATION = (byte) 0x20;
+	public static final byte RETURNED_MAILBOX_EMPTY = (byte) 0x40;
+	public static final byte RETURNED_NO_MORE_HANDLES = (byte) 0x81;
+	public static final byte RETURNED_NO_SPACE = (byte) 0x82;
+	public static final byte RETURNED_NO_MORE_FILES = (byte) 0x83;
+	public static final byte RETURNED_END_OF_FILE_EXPECTED = (byte) 0x84;
+	public static final byte RETURNED_END_OF_FILE = (byte) 0x85;
+	public static final byte RETURNED_NOT_A_LINEAR_FILE = (byte) 0x86;
+	public static final byte RETURNED_FILE_NOT_FOUND = (byte) 0x87;
+	public static final byte RETURNED_HANDLE_ALL_READY_CLOSED = (byte) 0x88;
+	public static final byte RETURNED_NO_LINEAR_SPACE = (byte) 0x89;
+	public static final byte RETURNED_UNDEFINED_ERROR = (byte) 0x8A;
+	public static final byte RETURNED_FILE_IS_BUSY = (byte) 0x8B;
+	public static final byte RETURNED_NO_WRITE_BUFFERS = (byte) 0x8C;
+	public static final byte RETURNED_APPEND_NOT_POSSIBLE = (byte) 0x8D;
+	public static final byte RETURNED_FILE_IS_FULL = (byte) 0x8E;
+	public static final byte RETURNED_FILE_EXISTS = (byte) 0x8F;
+	public static final byte RETURNED_MODULE_NOT_FOUND = (byte) 0x90;
+	public static final byte RETURNED_OUT_OF_BOUNDARY = (byte) 0x91;
+	public static final byte RETURNED_ILLEGAL_FILE_NAME = (byte) 0x92;
+	public static final byte RETURNED_ILLEGAL_HANDLE = (byte) 0x93;
+	public static final byte RETURNED_REQUEST_FAILED = (byte) 0xBD;
+	public static final byte RETURNED_UNKNOWN_OP_CODE = (byte) 0xBE;
+	public static final byte RETURNED_INSANE_PACKET = (byte) 0xBF;
+	public static final byte RETURNED_OUT_OF_RANGE = (byte) 0xC0;
+	public static final byte RETURNED_BUS_ERROR = (byte) 0xDD;
+	public static final byte RETURNED_COMMUNICATION_OVERFLOW = (byte) 0xDE;
+	public static final byte RETURNED_CHANEL_INVALID = (byte) 0xDF;
+	public static final byte RETURNED_CHANEL_BUSY = (byte) 0xE0;
+	public static final byte RETURNED_CO_ACTIVE_PROGRAM = (byte) 0xEC;
+	public static final byte RETURNED_ILLEGAL_SIZE = (byte) 0xED;
+	public static final byte RETURNED_ILLEGAL_MAILBOX = (byte) 0xEE;
+	public static final byte RETURNED_INVALID_FIELD = (byte) 0xEF;
+	public static final byte RETURNED_BAD_INPUT_OUTPUT = (byte) 0xF0;
+	public static final byte RETURNED_INSUFFICIENT_MEMMORY = (byte) 0xFB;
 
 	// Extra
 	// Motor direction
@@ -141,14 +150,12 @@ public class NXTValue {
 
 	/**
 	 * Connection confirmation beep tone played on NXT device when Android
-	 * device is connected to the targeted NXT device
+	 * device is successfully connected
 	 */
 	public static final byte[] CONFIRMATION_TONE = { 0x06, 0x00, (byte) 0x80,
 			0x03, 0x0B, 0x02, (byte) 0xFA, 0x00 };
 
 	// byte[] setPortMode = { 0x05, 0x00, (byte) 0x80, 0x05, 0x03, 0x0B, 0x00 };
-
-	
 
 	// public static final byte[] ASK_STATUS_ON_PORT_4 = { 0x03, 0x00, 0x00,
 	// 0x0E,
@@ -163,7 +170,7 @@ public class NXTValue {
 	// */
 	// public static byte[] MOTOR_DATA = {
 	// // Right motor
-	// 0x0c, // Length (from byte 2 to 13 inclusive)
+	// 0x0c, // Length (from byte 2 to 12 inclusive)
 	// 0x00, // Start from byte 2
 	// (byte) RETURN_VOID, // Return type
 	// 0x04, // setOutputState
@@ -179,7 +186,7 @@ public class NXTValue {
 	// 0x00, // Tacho limit
 	//
 	// // Left motor
-	// 0x0c, // Length (from byte 2 to 13 inclusive)
+	// 0x0c, // Length (from byte 2 to 12 inclusive)
 	// 0x00, // Start from byte 2
 	// (byte) RETURN_VOID, // Return type
 	// SET_OUTPUT_STATE, // Set Output State

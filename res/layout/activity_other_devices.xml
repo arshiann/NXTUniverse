@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/margin_16dp" >
+
+    <TextView
+        android:id="@+id/otherdevices_textView_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Hint"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ListView
+        android:id="@+id/otherdevices_listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/otherdevices_scan"
+        android:layout_below="@+id/otherdevices_textView_hint"
+        android:scrollbarStyle="outsideInset" >
+    </ListView>
+
+    <Button
+        android:id="@+id/otherdevices_scan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Button" />
+
+    <ProgressBar
+        android:id="@+id/otherdevice_progressBar_scan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/otherdevices_scan"
+        android:layout_alignRight="@+id/otherdevices_scan"
+        android:layout_alignTop="@+id/otherdevices_scan"
+        android:padding="8dp" />
+
+</RelativeLayout>

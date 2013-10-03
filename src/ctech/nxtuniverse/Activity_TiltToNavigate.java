@@ -158,9 +158,17 @@ public class Activity_TiltToNavigate extends Activity implements
 
 		// +/- the tilt on y axis
 		if (yAngleCalibrated > 90) {
-			leftPower += (int) ((90 - yAngleCalibrated) / 20 * 100);
+			if (leftPower > 0) {
+				leftPower += (int) ((90 - yAngleCalibrated) / 20 * 100);
+			} else { // power smaller than zero, tilting back left goes left backward
+				leftPower -= (int) ((90 - yAngleCalibrated) / 20 * 100);
+			}
 		} else {
-			rightPower += (int) -((90 - yAngleCalibrated) / 20 * 100);
+			if (rightPower > 0) {
+				rightPower += (int) -((90 - yAngleCalibrated) / 20 * 100);
+			} else { // power smaller than zero, tilting back right goes right backward 
+				rightPower -= (int) -((90 - yAngleCalibrated) / 20 * 100);
+			}
 		}
 		// 20 deg to reach power of 0 therefore 40 deg to reach power of
 		// -100

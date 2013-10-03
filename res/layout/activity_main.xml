@@ -1,72 +1,48 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/margin_16dp"
     tools:context=".Activity_Main" >
 
-
-    <TextView
-        android:id="@+id/textView_version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="NXT Universe V 0.0" />
-
-    <Button
-        android:id="@+id/button_scanDevice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView_version"
-        android:layout_alignRight="@+id/textView_version"
-        android:layout_toRightOf="@+id/imageView_bluetooth"
-        android:text="Other Device" />
-
     <ImageView
-        android:id="@+id/imageView_bluetooth"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignBottom="@+id/button_scanDevice"
-        android:src="@drawable/bluetooth_dead" />
-
-    <TextView
-        android:id="@+id/textView_main_middleMark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <Button
-        android:id="@+id/button_connect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/textView_main_middleMark"
-        android:layout_centerVertical="true"
-        android:text="Connect" />
-
-    <Button
-        android:id="@+id/button_disconnect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_connect"
-        android:layout_alignBottom="@+id/button_connect"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/button_connect"
-        android:text="Disconnect" />
-
-    <ImageView
-        android:id="@+id/imageView_xImage"
+        android:id="@+id/main_imageView_xImage"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_above="@+id/button_connect"
-        android:layout_centerHorizontal="true"
         android:src="@drawable/ic_launcher" />
 
-</RelativeLayout>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/main_button_connect"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Connect" />
+
+        <Button
+            android:id="@+id/main_button_disconnect"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Disconnect" />
+    </TableRow>
+
+    <Button
+        android:id="@+id/main_button_otherDevice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Other Device" />
+
+    <TextView
+        android:id="@+id/main_textView_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NXT Universe V 0.0" />
+
+</LinearLayout>

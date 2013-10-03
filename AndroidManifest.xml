@@ -47,6 +47,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="ctech.nxtuniverse.Activity_OtherDevices"
+            android:label="Other Devices"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="nxtuniverse.OTHER_DEVICES" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="ctech.nxtuniverse.Activity_Navigate"
             android:label="Navigate"
             android:screenOrientation="portrait" >
@@ -58,10 +68,18 @@
         </activity>
         <activity
             android:name="ctech.nxtuniverse.Activity_TiltToNavigate"
-             
             android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="nxtuniverse.TILT_NAVIGATE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ctech.nxtuniverse.Activity_Joystick"
+            android:label="@string/title_activity_activity__joystick" >
+            <intent-filter>
+                <action android:name="nxtuniverse.JOYSTICK" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp" >
+
+    <TextView
+        android:id="@+id/listview_other_devices_textView_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/listview_other_devices_imageView_icon"
+        android:text="Name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/listview_other_devices_textView_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/listview_other_devices_textView_name"
+        android:layout_below="@+id/listview_other_devices_textView_name"
+        android:text="Address"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/listview_other_devices_imageView_icon"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/listview_other_devices_textView_address"
+        android:layout_alignTop="@+id/listview_other_devices_textView_name" 
+        android:src="@drawable/device_nxt"/>
+
+</RelativeLayout>

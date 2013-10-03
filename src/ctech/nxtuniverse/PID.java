@@ -15,16 +15,20 @@ import android.util.Log;
 public class PID extends Thread {
 
 	/**
-	 * PID constructor 
-	 * @param robot - Robot
-	 * @param mode - Refer to NXTValue class
-	 * @param target - Distance(cm) or Speed(cm/s)
+	 * PID constructor
+	 * 
+	 * @param robot
+	 *            - Robot
+	 * @param mode
+	 *            - Refer to NXTValue class
+	 * @param target
+	 *            - Distance(cm) or Speed(cm/s)
 	 */
 	PID(Robot robot, int mode, int target) {
-		if (mode == 1) {
-			setWantPosition(target);
+		if (mode == NXTValue.PID_MODE_DISTANCE) {
+			setWantDistance(target);
 			active = true;
-		} else if (mode == 2) {
+		} else if (mode == NXTValue.PID_MODE_SPEED) {
 			setWantSpeed(target);
 			active = true;
 		}
@@ -32,24 +36,24 @@ public class PID extends Thread {
 		this.robot1 = robot;
 	}
 
-	Robot robot1;
-	
-	int mode;
+	private Robot robot1;
 
-	// PID Controller's constants
+	private int mode;
+
+	// Distance PID Controller's constants
 	private double distanceKp = 5;
 	private double distanceKi = 0;
 	private double distanceKd = 0;
+	private int wantDistance; // Measured in cm
 
-	private int wantPosition; // Measured in cm
+	// Speed PID Controller's constants
+	private double speedKp = 3;
+	private double speedKi = 0;
+	private double speedKd = 0;
+	private double wantSpeed; // Measured in cm/s
 
-	// PID Controller's constants
-	double speedKp = 3;
-	double speedKi = 0;
-	double speedKd = 0;
-
-	private double wantSpeed = 3; // Measured in cm/s
-
+	// 
+	
 	// To control thread's life cycle
 	private volatile boolean active = false;
 
@@ -57,16 +61,15 @@ public class PID extends Thread {
 
 	public void run() {
 
-		if (mode == 1) {
+		if (mode == NXTValue.PID_MODE_DISTANCE) {
 			// Scope of variables
 			double distanceError = 0;
-			double integral = 0;
-			double derivative = 0;
+			double distanceIntegral = 0;
+			double distanceDerivative = 0;
 
-			double actualPosition;
-			double oldError = 0;
+			double actualDistance;
+			double oldDistanceError = 0;
 
-			// XXX Output should be Int. Might be the cause of negative output
 			int output = 0;
 			int outputLimit = 100;
 			int integralLimit = 100;
@@ -80,30 +83,30 @@ public class PID extends Thread {
 				startTime = System.currentTimeMillis();
 
 				// Get distance
-				actualPosition = robot1.getUltrasonicSensorValue();
-				Log.i("Actual Position", String.valueOf(actualPosition));
+				actualDistance = robot1.getDistanceFromUltrasonicSensor();
+				Log.i("Actual Distance", String.valueOf(actualDistance));
 
 				// //////////////// DistancePID calculation //////////////////
-				distanceError = actualPosition - wantPosition;
+				distanceError = actualDistance - wantDistance;
 				Log.i("Proportional", String.valueOf(distanceError));
 
-				integral += distanceError; //XXX correct the equation
-				Log.i("Integral", String.valueOf(integral));
+				distanceIntegral += distanceError; // XXX correct the equation
+				Log.i("Integral", String.valueOf(distanceIntegral));
 
 				// Limiting the integral
-				if (integral > integralLimit) {
-					integral = integralLimit;
-				} else if (integral < -integralLimit) {
-					integral = -integralLimit;
+				if (distanceIntegral > integralLimit) {
+					distanceIntegral = integralLimit;
+				} else if (distanceIntegral < -integralLimit) {
+					distanceIntegral = -integralLimit;
 				}
 
-				derivative = (distanceError - oldError);
-				Log.i("Derivative", String.valueOf(derivative));
+				distanceDerivative = (distanceError - oldDistanceError);
+				Log.i("Derivative", String.valueOf(distanceDerivative));
 				// ////////////// DistancePID calculation ends ///////////////
 
 				// Calculating the final output
 				output = (int) ((distanceKp * distanceError)
-						+ (distanceKi * integral) + (distanceKd * derivative));
+						+ (distanceKi * distanceIntegral) + (distanceKd * distanceDerivative));
 				Log.i("Output", String.valueOf(output));
 
 				// Limiting the final output
@@ -122,7 +125,7 @@ public class PID extends Thread {
 				robot1.write(motor);
 
 				// Setting old values
-				oldError = distanceError;
+				oldDistanceError = distanceError;
 
 				// Calculating the time elapse.
 				// The time to complete the cycle (loop).
@@ -146,7 +149,7 @@ public class PID extends Thread {
 			motor[19] = 0;
 			robot1.setMotorData(motor);
 			robot1.write(motor);
-		} else if (mode == 2) {
+		} else if (mode == NXTValue.PID_MODE_SPEED) {
 
 			// Scope of variables
 			double speedError = 0;
@@ -185,12 +188,13 @@ public class PID extends Thread {
 				time = System.currentTimeMillis();
 
 				// Converting arbitrary rotation count to cm/s
-				double motorSpeed = ((motorRotationCount - oldMotorRotationCount) / 25)
+				double motorSpeed = ((motorRotationCount - oldMotorRotationCount) / 20.46)
 						/ ((double) (time - oldTime) / 1000);
 				Log.i("Speed", String.valueOf(motorSpeed));
 
-				// /////////////////// SpeedPID calculation
-				// /////////////////////
+				
+
+				// ////////////// SpeedPID calculation /////////////////
 				speedError = wantSpeed - motorSpeed;
 				Log.i("Proportional", String.valueOf(speedError));
 
@@ -206,8 +210,7 @@ public class PID extends Thread {
 				// derivative = (speedError - oldSpeedError) / (time -
 				// oldTime);
 				// Log.i("Derivative", String.valueOf(derivative));
-				// ///////////////// SpeedPID calculation ends
-				// //////////////////
+				// //////////// SpeedPID calculation ends //////////////
 
 				// Calculating the final output value
 				output += (int) ((speedKp * speedError) + (speedKi * integral) + (speedKd * derivative));
@@ -260,25 +263,28 @@ public class PID extends Thread {
 
 	}
 
-	public void setWantPosition(int wantPosition) {
+	public void setWantDistance(int wantDistance) {
 		// NXT's body in front of the sensor is 13 cm
-		if (wantPosition <= 13) {
-			this.wantPosition = 13;
+		if (wantDistance <= 13) {
+			this.wantDistance = 13;
 		} else {
-			this.wantPosition = wantPosition;
+			this.wantDistance = wantDistance;
 		}
 	}
 
 	public void setWantSpeed(double wantSpeed) {
-		this.wantSpeed = wantSpeed;
+		// max speed test
+		// 07-02 23:42:48.897: I/maxSpeed(4460): 51.28677195797114
+		if (wantSpeed < 60) {
+			this.wantSpeed = wantSpeed;
+		}
 	}
-
+	
 	// XXX add "It is recommended to use this method in "onDestroy" method." in
 	// the doc after adding pause and resume method
 	/**
 	 * Stops the PID controller completely.
 	 */
-
 	public void kill() {
 		active = false;
 	}

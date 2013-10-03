@@ -14,37 +14,53 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Button
-        android:id="@+id/left"
+        android:id="@+id/button_control_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/backward"
-        android:layout_alignBottom="@+id/backward"
-        android:layout_toLeftOf="@+id/backward"
+        android:layout_alignBaseline="@+id/button_control_backward"
+        android:layout_alignBottom="@+id/button_control_backward"
+        android:layout_toLeftOf="@+id/button_control_backward"
         android:text="L" />
 
     <Button
-        android:id="@+id/right"
+        android:id="@+id/button_control_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/backward"
-        android:layout_alignBottom="@+id/backward"
-        android:layout_toRightOf="@+id/backward"
+        android:layout_alignBaseline="@+id/button_control_backward"
+        android:layout_alignBottom="@+id/button_control_backward"
+        android:layout_toRightOf="@+id/button_control_backward"
         android:text="R" />
 
     <Button
-        android:id="@+id/backward"
+        android:id="@+id/button_control_backward"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/forward"
+        android:layout_alignLeft="@+id/button_control_forward"
         android:layout_alignParentBottom="true"
         android:text="B" />
 
     <Button
-        android:id="@+id/forward"
+        android:id="@+id/button_control_forward"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/right"
+        android:layout_above="@+id/button_control_right"
         android:layout_centerHorizontal="true"
         android:text="F" />
+
+    <Button
+        android:id="@+id/button_control_test1"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Test 1" />
+
+    <Button
+        android:id="@+id/button_control_test2"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/button_control_test1"
+        android:text="Test 1" />
 
 </RelativeLayout>

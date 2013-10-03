@@ -2,6 +2,7 @@ package ctech.nxtuniverse;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -10,12 +11,15 @@ public class Activity_Control extends Activity {
 
 	// Buttons
 	private Button forward, backward, left, right;
+	private Button test1, test2;
 
-	private Robot robot1;
+	private Robot robot;
 
 	// PID Controllers
 	static PID pid;
 	static boolean pidRunning = false;
+
+	int test2Counter = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,67 +27,68 @@ public class Activity_Control extends Activity {
 		setContentView(R.layout.activity_control);
 
 		// Setting the robot
-		robot1 = Activity_Main.robot[0];
+		robot = Activity_Main.robot[0];
 
 		// Primary navigation buttons
-		forward = (Button) findViewById(R.id.forward);
-		backward = (Button) findViewById(R.id.backward);
-		left = (Button) findViewById(R.id.left);
-		right = (Button) findViewById(R.id.right);
+		forward = (Button) findViewById(R.id.button_control_forward);
+		backward = (Button) findViewById(R.id.button_control_backward);
+		left = (Button) findViewById(R.id.button_control_left);
+		right = (Button) findViewById(R.id.button_control_right);
 
-		forward.setOnTouchListener(new View.OnTouchListener() {
+		// Other buttons
+		test1 = (Button) findViewById(R.id.button_control_test1);
+		test1.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.DIRECTION_FORWARD, 100);
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.DIRECTION_STOP, 0);
-				}
-				return true;
+			public void onClick(View v) {
+
+				robot.addToPositionPID(Robot.SIDE_BOTH, 20);
 			}
 		});
 
-		backward.setOnTouchListener(new View.OnTouchListener() {
-
+		test2 = (Button) findViewById(R.id.button_control_test2);
+		test2.setText("test2");
+		test2.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.DIRECTION_BACKWARD, 100);
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.DIRECTION_STOP, 0);
+			public void onClick(View v) {
+				if (test2Counter % 2 == 0) {
+					robot.startPositionPID();
+				} else {
+					robot.stopPositionPID();
 				}
-				return true;
+				test2Counter++;
 			}
 		});
 
-		right.setOnTouchListener(new View.OnTouchListener() {
+		forward.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.DIRECTION_RIGHT, 100);
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.DIRECTION_STOP, 0);
-				}
-				return true;
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
 			}
 		});
 
-		left.setOnTouchListener(new View.OnTouchListener() {
+		backward.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				int action = event.getAction();
-				if (action == MotionEvent.ACTION_DOWN) { // button is touched
-					robot1.move(NXTValue.DIRECTION_LEFT, 100);
-				} else if (action == MotionEvent.ACTION_UP) { // is not touched
-					robot1.move(NXTValue.DIRECTION_STOP, 0);
-				}
-				return true;
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+			}
+		});
+
+		left.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+			}
+		});
+
+		right.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
 			}
 		});
 	}

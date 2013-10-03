@@ -25,3 +25,42 @@
 		xImage.setImageResource(R.drawable.connection_disconnected);
 	}
 
+2. Get motor rotation
+
+	// left motor
+	// int value2 = input5[19] + (input5[20] << 8) + (input5[21] << 16)
+	// + (input5[22] << 24);
+
+ 	//////////////////////////////////////////////////////////////
+	byte[] rightMotorCommand = { Value.getReturnStatus(), 0x06,
+	rightMotorPort };
+	byte[] leftMotorCommand = { Value.getReturnStatus(), 0x06,
+	leftMotorPort };
+		
+	byte[] rightMotorCommandingData = getData(rightMotorCommand);
+	byte[] leftMotorCommandingData = getData(leftMotorCommand);
+		
+	write(rightMotorCommandingData);
+	sleep(100);
+	write(leftMotorCommandingData);
+		
+	int[] input4 = read();
+	sleep(100);
+	int[] input5 = read();
+		
+	// right motor
+	int value = input4[19] + (input4[20] << 8) + (input4[21] << 16)
+	+ (input4[22] << 24);
+	display2.setText(value + " suc 17-20");
+	int value2 = input4[15] + (input4[16] << 8)
+	+ (input4[17] << 16) + (input4[18] << 24);
+	display3.setText(value2 + " suc 13-16");
+	int value3 = input4[23] + (input4[24] << 8)
+	+ (input4[25] << 16) + (input4[26] << 24);
+	display4.setText(value3 + " suc 21-24");
+	int value5 = input5[23] + (input5[24] << 8)
+	+ (input5[25] << 16) + (input5[26] << 24);
+	display5.setText(value5 + " suc 21-24");
+	//////////////////////////////////////////////////////////////
+	
+	

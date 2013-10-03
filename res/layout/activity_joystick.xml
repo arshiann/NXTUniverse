@@ -1,0 +1,61 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity_Joystick" >
+
+    <ImageView
+        android:id="@+id/ivJoystick"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/joystick" />
+
+    <ImageView
+        android:id="@+id/ivKnob"
+        android:layout_width="100px"
+        android:layout_height="100px"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/knob" />
+
+    <TextView
+        android:id="@+id/tvRightPower"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvLeftPower"
+        android:layout_alignBottom="@+id/tvLeftPower"
+        android:layout_toRightOf="@+id/ivKnob"
+        android:gravity="center"
+        android:text="RMP: 0"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/tvLeftPower"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivJoystick"
+        android:layout_toLeftOf="@+id/ivKnob"
+        android:gravity="center"
+        android:text="LMP: 0"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/tvRadiusError"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:textColor="#ffff0000"
+        android:textSize="25dp" />
+
+    <SeekBar
+        android:id="@+id/sbPower"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ivJoystick"
+        android:layout_alignParentLeft="true" />
+
+</RelativeLayout>
